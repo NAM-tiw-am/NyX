@@ -9,8 +9,6 @@ from backend.models import (
     DailyQuest, UserQuestProgress, MonthlyChallenge, Notification,
 )
 from backend.schemas.shared import DashboardOut, QuestOut, MonthlyChallengeOut, NotificationOut
-from backend.services.gamification import complete_quest_if_applicable
-from backend.models.quest import QuestType
 
 router = APIRouter(prefix="/users/{user_id}/dashboard", tags=["Dashboard"])
 
@@ -30,8 +28,7 @@ def get_dashboard(user_id: int, db: Session = Depends(get_db)):
     """
     user = _get_user(user_id, db)
 
-    # Mark dashboard quest
-    quest_result = complete_quest_if_applicable(user, QuestType.CHECK_DASHBOARD, db)
+    quest_result = None
 
     # Financial aggregates
     incomes = db.query(IncomeSource).filter(IncomeSource.user_id == user_id).all()

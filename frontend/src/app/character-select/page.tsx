@@ -8,19 +8,31 @@ import AvatarIcon from '@/components/ui/AvatarIcon';
 
 export default function CharacterSelectPage() {
   const router = useRouter();
-  const { selectedCharacter, setSelectedCharacter } = useAppStore();
+  const { selectedCharacter, setSelectedCharacter, accentColor, setAccentColor, createCurrentUser } = useAppStore();
 
-  const [selectedHeadwear, setSelectedHeadwear] = useState('Hood_01');
-  const [selectedArmor, setSelectedArmor] = useState('Trench_Coat');
-  const [selectedAccessory, setSelectedAccessory] = useState('Katana_Drive');
-  const [accentColor, setAccentColor] = useState('#cb2957');
+  const [selectedHeadwear, setSelectedHeadwear] = useState('Classic Hood');
+  const [selectedArmor, setSelectedArmor] = useState('Travel Coat');
+  const [selectedAccessory, setSelectedAccessory] = useState('Savings Planner');
+  const [username, setUsername] = useState(() => {
+    if (typeof localStorage === 'undefined') return '';
+    return localStorage.getItem('nyx_pending_username') || '';
+  });
+  const [isSaving, setIsSaving] = useState(false);
 
   const handleSelectChar = (char: Character) => {
     setSelectedCharacter(char);
   };
 
-  const handleConfirm = () => {
-    router.push('/dashboard');
+  const handleConfirm = async () => {
+    if (!username.trim() || isSaving) return;
+    setIsSaving(true);
+    try {
+      await createCurrentUser(username);
+      localStorage.removeItem('nyx_pending_username');
+      router.push('/dashboard');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleReRoll = () => {
@@ -41,14 +53,14 @@ export default function CharacterSelectPage() {
             BACK TO INTRO
           </Link>
           <h1 className="font-space text-3xl sm:text-5xl font-bold text-white uppercase tracking-tighter">
-            Char_Config
+            Character Select
           </h1>
-          <p className="font-mono text-xs text-[#e1bec2] mt-1">// ESTABLISH YOUR DIGITAL IDENTITY</p>
+          <p className="font-mono text-xs text-[#e1bec2] mt-1">Choose your profile and preferred app color.</p>
         </div>
 
         <div className="font-mono text-xs text-[#ffb2bd] flex items-center gap-2 border-[3px] border-black px-3 py-1.5 bg-[#1a1a1a]">
-          <span className="material-symbols-outlined text-sm">terminal</span>
-          INIT_SEQUENCE
+          <span className="material-symbols-outlined text-sm">person_add</span>
+          New Account
         </div>
       </div>
 
@@ -57,10 +69,21 @@ export default function CharacterSelectPage() {
         {/* Left Panel: Loadout Controls */}
         <section className="lg:col-span-3 bg-[#1a1a1a] border-[3px] border-black p-5 brutalist-shadow flex flex-col">
           <h2 className="font-space text-xl font-bold text-white uppercase border-b-[3px] border-black pb-2 mb-4">
-            Loadout
+            Profile Details
           </h2>
 
           <div className="space-y-5 flex-1">
+            <div>
+              <label className="block font-mono text-xs text-[#ffb2bd] uppercase mb-2">Username</label>
+              <input
+                value={username}
+                onChange={(event) => setUsername(event.target.value)}
+                className="w-full bg-[#131313] border-[3px] border-black p-3 font-mono text-sm text-white focus:outline-none"
+                placeholder="Enter your name"
+                style={{ borderColor: username ? accentColor : undefined }}
+              />
+            </div>
+
             {/* Headwear */}
             <div>
               <div className="flex items-center gap-2 mb-2">
@@ -68,15 +91,16 @@ export default function CharacterSelectPage() {
                 <h3 className="font-mono text-xs font-bold text-[#e2e2e2] uppercase">Headwear</h3>
               </div>
               <div className="grid grid-cols-3 gap-2">
-                {['Hood_01', 'Audio_Rig', 'Visor_X'].map((item) => (
+                {['Classic Hood', 'Audio Rig', 'Focus Visor'].map((item) => (
                   <button
                     key={item}
                     onClick={() => setSelectedHeadwear(item)}
                     className={`p-2 border-[2px] border-black font-mono text-[10px] font-bold uppercase transition-all ${
                       selectedHeadwear === item
-                        ? 'bg-[#cb2957] text-black shadow-[2px_2px_0px_0px_#000]'
+                        ? 'text-black shadow-[2px_2px_0px_0px_#000]'
                         : 'bg-[#2a2a2a] text-[#c6c6c6] hover:bg-[#353535]'
                     }`}
+                    style={selectedHeadwear === item ? { backgroundColor: accentColor } : undefined}
                   >
                     {item}
                   </button>
@@ -91,15 +115,16 @@ export default function CharacterSelectPage() {
                 <h3 className="font-mono text-xs font-bold text-[#e2e2e2] uppercase">Armor</h3>
               </div>
               <div className="grid grid-cols-3 gap-2">
-                {['Light_Mesh', 'Trench_Coat', 'Plating'].map((item) => (
+                {['Light Mesh', 'Travel Coat', 'Protective Plate'].map((item) => (
                   <button
                     key={item}
                     onClick={() => setSelectedArmor(item)}
                     className={`p-2 border-[2px] border-black font-mono text-[10px] font-bold uppercase transition-all ${
                       selectedArmor === item
-                        ? 'bg-[#cb2957] text-black shadow-[2px_2px_0px_0px_#000]'
+                        ? 'text-black shadow-[2px_2px_0px_0px_#000]'
                         : 'bg-[#2a2a2a] text-[#c6c6c6] hover:bg-[#353535]'
                     }`}
+                    style={selectedArmor === item ? { backgroundColor: accentColor } : undefined}
                   >
                     {item}
                   </button>
@@ -114,15 +139,16 @@ export default function CharacterSelectPage() {
                 <h3 className="font-mono text-xs font-bold text-[#e2e2e2] uppercase">Accessory</h3>
               </div>
               <div className="grid grid-cols-2 gap-2">
-                {['Katana_Drive', 'Data_Pad'].map((item) => (
+                {['Savings Planner', 'Data Pad'].map((item) => (
                   <button
                     key={item}
                     onClick={() => setSelectedAccessory(item)}
                     className={`p-2 border-[2px] border-black font-mono text-[10px] font-bold uppercase transition-all ${
                       selectedAccessory === item
-                        ? 'bg-[#cb2957] text-black shadow-[2px_2px_0px_0px_#000]'
+                        ? 'text-black shadow-[2px_2px_0px_0px_#000]'
                         : 'bg-[#2a2a2a] text-[#c6c6c6] hover:bg-[#353535]'
                     }`}
+                    style={selectedAccessory === item ? { backgroundColor: accentColor } : undefined}
                   >
                     {item}
                   </button>
@@ -134,10 +160,10 @@ export default function CharacterSelectPage() {
             <div>
               <div className="flex items-center gap-2 mb-2">
                 <span className="material-symbols-outlined text-[#cb2957] text-lg">palette</span>
-                <h3 className="font-mono text-xs font-bold text-[#e2e2e2] uppercase">Neon Accent</h3>
+                <h3 className="font-mono text-xs font-bold text-[#e2e2e2] uppercase">App Accent</h3>
               </div>
               <div className="flex gap-3">
-                {['#cb2957', '#00ffcc', '#ff00ff', '#ffff00'].map((color) => (
+                {['#cb2957', '#00b894', '#3867d6', '#f7b731'].map((color) => (
                   <button
                     key={color}
                     onClick={() => setAccentColor(color)}
@@ -155,8 +181,8 @@ export default function CharacterSelectPage() {
         {/* Center Panel: Sprite Grid (9 Avatars from user sheet) */}
         <section className="lg:col-span-6 bg-[#1a1a1a] border-[3px] border-black p-5 brutalist-shadow flex flex-col">
           <div className="flex justify-between items-center mb-4 border-b-[3px] border-black pb-2">
-            <h2 className="font-space text-xl font-bold text-white uppercase">Select Sprite</h2>
-            <div className="bg-[#cb2957] text-black font-mono text-xs px-2 py-0.5 border-[2px] border-black font-bold">
+            <h2 className="font-space text-xl font-bold text-white uppercase">Choose Character</h2>
+            <div className="text-black font-mono text-xs px-2 py-0.5 border-[2px] border-black font-bold" style={{ backgroundColor: accentColor }}>
               ACTIVE: {selectedCharacter.name}
             </div>
           </div>
@@ -170,9 +196,10 @@ export default function CharacterSelectPage() {
                   onClick={() => handleSelectChar(char)}
                   className={`border-[3px] border-black p-2 relative flex flex-col items-center justify-between transition-all ${
                     isSelected
-                      ? 'bg-[#cb2957] text-black shadow-[4px_4px_0px_0px_#000]'
+                      ? 'text-black shadow-[4px_4px_0px_0px_#000]'
                       : 'bg-[#2a2a2a] hover:bg-[#353535] text-white'
                   }`}
+                  style={isSelected ? { backgroundColor: accentColor } : undefined}
                 >
                   {isSelected && (
                     <div className="absolute top-0 left-0 bg-black text-white font-mono text-[9px] font-bold px-1.5 py-0.5 border-b-[2px] border-r-[2px] border-black z-10">
@@ -252,14 +279,16 @@ export default function CharacterSelectPage() {
           onClick={handleReRoll}
           className="w-full sm:w-auto bg-[#2a2a2a] text-[#e2e2e2] border-[2px] border-black px-6 py-3 font-mono text-xs font-bold uppercase hover:bg-[#353535] transition-colors"
         >
-          🎲 RE-ROLL OPERATIVE
+          Randomize Character
         </button>
 
         <button
           onClick={handleConfirm}
-          className="w-full sm:w-auto bg-[#cb2957] text-black border-[3px] border-black px-8 py-3 font-space text-lg font-bold uppercase brutalist-shadow hover:bg-[#ffb2bd] transition-colors"
+          disabled={!username.trim() || isSaving}
+          className="w-full sm:w-auto text-black border-[3px] border-black px-8 py-3 font-space text-lg font-bold uppercase brutalist-shadow hover:bg-[#ffb2bd] transition-colors disabled:opacity-50"
+          style={{ backgroundColor: accentColor }}
         >
-          CONFIRM OPERATIVE &rarr;
+          {isSaving ? 'Creating Profile...' : 'Create Profile'}
         </button>
       </div>
     </div>

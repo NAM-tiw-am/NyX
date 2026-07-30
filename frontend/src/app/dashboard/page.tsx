@@ -11,6 +11,9 @@ export default function DashboardPage() {
     maxXp,
     streakDays,
     totalBalance,
+    totalIncome,
+    totalExpenses,
+    netSavings,
     selectedCharacter,
     transactions,
     quests,
@@ -26,7 +29,7 @@ export default function DashboardPage() {
       <header className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 border-b-[3px] border-black pb-6">
         <div>
           <h1 className="font-space text-3xl sm:text-5xl font-bold text-white uppercase tracking-tight mb-2">
-            Command Center
+            Dashboard
           </h1>
 
           <div className="flex flex-wrap items-center gap-3">
@@ -39,7 +42,7 @@ export default function DashboardPage() {
             <div className="flex items-center gap-2 bg-[#1a1a1a] border-[3px] border-black px-3 py-1 brutalist-shadow">
               <AvatarIcon character={selectedCharacter} size="sm" />
               <span className="font-mono text-xs font-bold text-[#ffb2bd]">
-                {selectedCharacter.name} // LVL {level}
+                {selectedCharacter.name} {'//'} LVL {level}
               </span>
             </div>
           </div>
@@ -67,10 +70,10 @@ export default function DashboardPage() {
         </div>
         <div>
           <h3 className="font-mono text-xs font-bold text-[#ffb4ab] uppercase mb-1">
-            Tactical AI Alert
+            Athena Insight
           </h3>
           <p className="text-sm text-[#e2e2e2] font-inter">
-            Tech expenses increased by <span className="font-bold text-[#ffb4ab]">15% this week</span>. Consider allocating $200 more into your Emergency Vault.
+            Review this week&apos;s spending and move surplus funds toward your priority goals.
           </p>
         </div>
       </div>
@@ -118,10 +121,12 @@ export default function DashboardPage() {
                 <span className="font-mono text-xs font-bold uppercase text-[#77da9f] flex items-center gap-1">
                   <span className="material-symbols-outlined text-sm">arrow_downward</span> IN
                 </span>
-                <span className="font-space text-2xl font-bold text-white">$5,200</span>
+                <span className="font-space text-2xl font-bold text-white">
+                  ${totalIncome.toLocaleString('en-US', { maximumFractionDigits: 0 })}
+                </span>
               </div>
               <div className="h-4 w-full border-[2px] border-black bg-[#1a1a1a]">
-                <div className="h-full bg-[#77da9f] w-3/4" />
+                <div className="h-full bg-[#77da9f]" style={{ width: `${Math.min(100, totalIncome ? (totalIncome / Math.max(totalIncome, totalExpenses)) * 100 : 0)}%` }} />
               </div>
             </div>
 
@@ -130,25 +135,29 @@ export default function DashboardPage() {
                 <span className="font-mono text-xs font-bold uppercase text-[#ffb4ab] flex items-center gap-1">
                   <span className="material-symbols-outlined text-sm">arrow_upward</span> OUT
                 </span>
-                <span className="font-space text-2xl font-bold text-white">$3,100</span>
+                <span className="font-space text-2xl font-bold text-white">
+                  ${totalExpenses.toLocaleString('en-US', { maximumFractionDigits: 0 })}
+                </span>
               </div>
               <div className="h-4 w-full border-[2px] border-black bg-[#1a1a1a]">
-                <div className="h-full bg-[#ffb4ab] w-1/2" />
+                <div className="h-full bg-[#ffb4ab]" style={{ width: `${Math.min(100, totalExpenses ? (totalExpenses / Math.max(totalIncome, totalExpenses)) * 100 : 0)}%` }} />
               </div>
             </div>
           </div>
 
           <div className="mt-8 pt-4 border-t-[3px] border-black border-dashed text-center">
-            <span className="font-mono text-xs uppercase text-[#c6c6c6]">Net Yield: </span>
-            <span className="font-mono font-bold text-[#77da9f] text-base">+$2,100</span>
+            <span className="font-mono text-xs uppercase text-[#c6c6c6]">Net Balance: </span>
+            <span className="font-mono font-bold text-[#77da9f] text-base">
+              {netSavings >= 0 ? '+' : '-'}${Math.abs(netSavings).toLocaleString('en-US', { maximumFractionDigits: 0 })}
+            </span>
           </div>
         </section>
 
-        {/* Card 3: Active Quests (4 cols) */}
+        {/* Card 3: Active Goals (4 cols) */}
         <section className="lg:col-span-4 bg-[#131313] border-[3px] border-black p-6 brutalist-shadow flex flex-col justify-between">
           <div>
             <span className="font-mono text-xs font-bold uppercase text-white bg-black px-3 py-1 inline-block border-[2px] border-black mb-6">
-              Active Quests
+              Active Goals
             </span>
             <div className="space-y-5">
               {quests.map((q) => {
@@ -172,7 +181,7 @@ export default function DashboardPage() {
             href="/quests"
             className="w-full mt-6 bg-[#2a2a2a] text-[#e2e2e2] font-mono text-xs font-bold uppercase py-2.5 border-[2px] border-black text-center hover:bg-[#cb2957] hover:text-black transition-colors block"
           >
-            View All Quests &rarr;
+            View All Goals &rarr;
           </Link>
         </section>
 
@@ -239,3 +248,4 @@ export default function DashboardPage() {
     </main>
   );
 }
+

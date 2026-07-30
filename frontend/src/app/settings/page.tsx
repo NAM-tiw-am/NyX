@@ -24,7 +24,7 @@ export default function SettingsPage() {
           <h1 className="font-space text-3xl sm:text-5xl font-bold text-white uppercase tracking-tighter mb-1">
             System Settings
           </h1>
-          <p className="font-mono text-xs text-[#c6c6c6]">// CONFIGURATION &amp; SECURITY PROTOCOLS</p>
+          <p className="font-mono text-xs text-[#c6c6c6]">Manage profile, display, and security preferences</p>
         </div>
 
         {/* Avatar + Level Badge */}
@@ -32,7 +32,7 @@ export default function SettingsPage() {
           <AvatarIcon character={selectedCharacter} size="sm" />
           <div>
             <div className="font-space font-bold text-white text-xs uppercase">{agentName}</div>
-            <div className="font-mono text-[10px] text-[#cb2957] font-bold">LVL {level} OPERATIVE</div>
+            <div className="font-mono text-[10px] text-[#cb2957] font-bold">LEVEL {level} PROFILE</div>
           </div>
         </div>
       </header>
@@ -122,7 +122,7 @@ export default function SettingsPage() {
         <section className="border-[3px] border-black bg-[#1a1a1a] p-6 brutalist-shadow">
           <h2 className="font-space text-xl font-bold text-white border-b-[3px] border-black pb-2 uppercase mb-6 flex items-center gap-2">
             <span className="material-symbols-outlined text-[#cb2957]">lock</span>
-            Security Protocols
+            Security Settings
           </h2>
 
           <div className="space-y-4 font-mono text-xs">

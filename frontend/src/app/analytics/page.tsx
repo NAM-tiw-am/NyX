@@ -30,7 +30,7 @@ export default function AnalyticsPage() {
           <h1 className="font-space text-3xl sm:text-5xl font-bold text-white uppercase tracking-tighter mb-1">
             DATA // VISUALIZER
           </h1>
-          <p className="font-mono text-xs text-[#c6c6c6]">// System Status: Optimal | Data Stream: Active</p>
+          <p className="font-mono text-xs text-[#c6c6c6]">{'// System Status: Optimal | Data Stream: Active'}</p>
         </div>
 
         {/* Avatar + Level Badge */}
@@ -128,7 +128,7 @@ export default function AnalyticsPage() {
           <li className="flex items-start gap-2">
             <span>&bull;</span>
             <div>
-              <strong>Optimization Detected:</strong> Ration spending decreased month-over-month. Efficiency protocols are functioning normally.
+              <strong>Optimization Detected:</strong> Food spending decreased month-over-month. Your budget plan is on track.
             </div>
           </li>
           <li className="flex items-start gap-2">

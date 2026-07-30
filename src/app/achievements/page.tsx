@@ -24,7 +24,7 @@ export default function AchievementsPage() {
           <div className="flex items-center gap-3 bg-[#131313] border-[3px] border-black px-4 py-2 brutalist-shadow">
             <AvatarIcon character={selectedCharacter} size="md" />
             <div>
-              <div className="font-space font-bold text-white text-sm uppercase">LVL {level} OPERATIVE</div>
+              <div className="font-space font-bold text-white text-sm uppercase">LEVEL {level} PROFILE</div>
               <div className="font-mono text-[10px] text-[#77da9f] font-bold">RANK #4,281</div>
             </div>
           </div>

@@ -16,7 +16,7 @@ export default function ProfilePage() {
           <h1 className="font-space text-3xl sm:text-5xl font-bold text-white uppercase tracking-tighter mb-2">
             Operative Profile
           </h1>
-          <p className="font-mono text-xs text-[#c6c6c6]">{'// CLASSIFIED FISCAL VANGUARD DOSSIER'}</p>
+          <p className="font-mono text-xs text-[#c6c6c6]">Your finance profile and progress summary</p>
         </div>
 
         {/* Avatar + Level Badge */}
@@ -47,7 +47,7 @@ export default function ProfilePage() {
           </div>
 
           <p className="font-mono text-xs text-[#c6c6c6] mb-4">
-            Specialization: Savings Optimization &amp; High-Yield Protocol Management.
+            Focus: savings consistency, budget tracking, and goal progress.
           </p>
 
           <div>
@@ -116,7 +116,7 @@ export default function ProfilePage() {
         {/* Active Gear (6 cols) */}
         <section className="lg:col-span-6 bg-[#131313] border-[3px] border-black p-6 brutalist-shadow">
           <h3 className="font-space text-xl font-bold text-white uppercase border-b-[3px] border-black pb-2 mb-6">
-            Equipped Loadout
+            Linked Tools
           </h3>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -128,8 +128,8 @@ export default function ProfilePage() {
 
             <div className="bg-[#1a1a1a] border-[3px] border-black p-4 brutalist-shadow text-center">
               <span className="material-symbols-outlined text-3xl text-[#77da9f] mb-2">vault</span>
-              <div className="font-space font-bold text-white text-sm uppercase">HYS Vault</div>
-              <div className="font-mono text-[10px] text-[#77da9f] mt-1">Passive Yield Aura</div>
+              <div className="font-space font-bold text-white text-sm uppercase">Savings Account</div>
+              <div className="font-mono text-[10px] text-[#77da9f] mt-1">Goal funding source</div>
             </div>
 
             <div className="bg-[#131313] border-[3px] border-dashed border-[#353535] p-4 text-center opacity-60">
@@ -153,7 +153,7 @@ export default function ProfilePage() {
               <span className="material-symbols-outlined text-[#cb2957]">military_tech</span>
               <div>
                 <div className="font-bold text-white text-sm">LEVEL 42 REACHED</div>
-                <div className="text-[#c6c6c6]">Unlocked Fiscal Vanguard Title &amp; High-Yield Protocol</div>
+                <div className="text-[#c6c6c6]">Reached a new profile level through consistent tracking</div>
               </div>
             </div>
             <span className="text-[#77da9f] font-bold">2 DAYS AGO</span>

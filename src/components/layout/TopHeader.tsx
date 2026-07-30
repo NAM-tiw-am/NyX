@@ -9,8 +9,8 @@ export default function TopHeader() {
   const pathname = usePathname();
   const { level, selectedCharacter } = useAppStore();
 
-  // Hide top header on Intro (/) and Character Select (/character-select)
-  if (pathname === '/' || pathname === '/character-select') {
+  // Hide top header on Intro, Login, and Character Select.
+  if (pathname === '/' || pathname === '/login' || pathname === '/character-select') {
     return null;
   }
 

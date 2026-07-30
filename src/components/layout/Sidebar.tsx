@@ -24,11 +24,12 @@ export default function Sidebar() {
     selectedCharacter,
     setAddTransactionOpen,
     isSidebarCollapsed,
-    toggleSidebar
+    toggleSidebar,
+    logout
   } = useAppStore();
 
-  // Hide left bar on Intro (/) and Character Select (/character-select)
-  if (pathname === '/' || pathname === '/character-select') {
+  // Hide left bar on Intro, Login, and Character Select.
+  if (pathname === '/' || pathname === '/login' || pathname === '/character-select') {
     return null;
   }
 
@@ -90,7 +91,7 @@ export default function Sidebar() {
         }`}
       >
         <span className="material-symbols-outlined font-bold text-base">add</span>
-        {!isSidebarCollapsed && <span>+ ADD TX</span>}
+        {!isSidebarCollapsed && <span>Add Entry</span>}
       </button>
 
       {/* Navigation Links */}
@@ -140,7 +141,8 @@ export default function Sidebar() {
         </Link>
 
         <Link
-          href="/"
+          href="/login"
+          onClick={logout}
           title="Log Out"
           className={`flex items-center gap-3 p-3 font-mono text-xs font-bold uppercase text-[#ffb4ab] border-[3px] border-transparent hover:bg-[#353535] hover:border-black transition-all ${
             isSidebarCollapsed ? 'justify-center p-2.5' : ''

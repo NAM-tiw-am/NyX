@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
 
 from backend.config import settings
 from backend.database import engine
@@ -47,6 +48,17 @@ Your financial life, reimagined as an RPG adventure.
     docs_url="/docs",
     redoc_url="/redoc",
 )
+
+
+class BackendPrefixMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request, call_next):
+        prefix = "/api/backend"
+        if request.scope["path"].startswith(prefix):
+            request.scope["path"] = request.scope["path"][len(prefix):] or "/"
+        return await call_next(request)
+
+
+app.add_middleware(BackendPrefixMiddleware)
 
 # ── CORS ──────────────────────────────────────────────────────────────────────
 # Allows all origins — fine for a hackathon project.

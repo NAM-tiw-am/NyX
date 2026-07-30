@@ -30,7 +30,7 @@ export default function AnalyticsPage() {
           <h1 className="font-space text-3xl sm:text-5xl font-bold text-white uppercase tracking-tighter mb-1">
             DATA // VISUALIZER
           </h1>
-          <p className="font-mono text-xs text-[#c6c6c6]">// System Status: Optimal | Data Stream: Active</p>
+          <p className="font-mono text-xs text-[#c6c6c6]">{'// System Status: Optimal | Data Stream: Active'}</p>
         </div>
 
         {/* Avatar + Level Badge */}

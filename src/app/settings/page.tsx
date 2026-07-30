@@ -24,7 +24,7 @@ export default function SettingsPage() {
           <h1 className="font-space text-3xl sm:text-5xl font-bold text-white uppercase tracking-tighter mb-1">
             System Settings
           </h1>
-          <p className="font-mono text-xs text-[#c6c6c6]">// CONFIGURATION &amp; SECURITY PROTOCOLS</p>
+          <p className="font-mono text-xs text-[#c6c6c6]">{'// CONFIGURATION & SECURITY PROTOCOLS'}</p>
         </div>
 
         {/* Avatar + Level Badge */}

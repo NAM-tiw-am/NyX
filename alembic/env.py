@@ -13,10 +13,10 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Import our pre-configured engine (already has psycopg3 URL normalization applied)
-from app.database.session import engine, Base
+from backend.database.session import engine, Base
 
 # Import ALL models so Alembic autogenerate can detect every table
-import app.models  # noqa: F401
+import backend.models  # noqa: F401
 
 config = context.config
 

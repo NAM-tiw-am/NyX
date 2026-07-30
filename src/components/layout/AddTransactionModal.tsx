@@ -10,12 +10,14 @@ export default function AddTransactionModal() {
   const [category, setCategory] = useState('Groceries');
   const [amount, setAmount] = useState('');
   const [type, setType] = useState<'debit' | 'credit'>('debit');
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   if (!isAddTransactionOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!entity || !amount) return;
+    if (!entity || !amount || isSaving) return;
 
     let icon = 'shopping_cart';
     if (category === 'Salary') icon = 'work';
@@ -24,18 +26,26 @@ export default function AddTransactionModal() {
     if (category === 'Transfer') icon = 'payments';
     if (category === 'Consumables') icon = 'coffee';
 
-    addTransaction({
-      entity,
-      category,
-      amount: parseFloat(amount),
-      type,
-      date: 'Just now',
-      icon
-    });
+    try {
+      setIsSaving(true);
+      setError(null);
+      await addTransaction({
+        entity,
+        category,
+        amount: parseFloat(amount),
+        type,
+        date: 'Just now',
+        icon
+      });
 
-    setEntity('');
-    setAmount('');
-    setAddTransactionOpen(false);
+      setEntity('');
+      setAmount('');
+      setAddTransactionOpen(false);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Unable to save transaction');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -56,6 +66,12 @@ export default function AddTransactionModal() {
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          {error && (
+            <div className="bg-[#93000a] border-[2px] border-black p-3 font-mono text-xs text-white">
+              {error}
+            </div>
+          )}
+
           <div>
             <label className="block font-mono text-xs text-[#ffb2bd] uppercase mb-1">Entity / Name</label>
             <input
@@ -113,9 +129,10 @@ export default function AddTransactionModal() {
 
           <button
             type="submit"
+            disabled={isSaving}
             className="w-full mt-4 bg-[#cb2957] text-white font-space text-lg font-bold uppercase py-3 border-[3px] border-black brutalist-shadow hover:bg-[#ffb2bd] hover:text-black transition-colors"
           >
-            CONFIRM TRANSACTION
+            {isSaving ? 'SYNCING...' : 'CONFIRM TRANSACTION'}
           </button>
         </form>
       </div>

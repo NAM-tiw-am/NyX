@@ -15,9 +15,9 @@ export default function BudgetsPage() {
       <header className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b-[3px] border-black pb-6">
         <div>
           <h1 className="font-space text-3xl sm:text-5xl font-bold text-white mb-1 uppercase tracking-tighter">
-            Budget Protocol
+            Budget Overview
           </h1>
-          <p className="font-mono text-sm text-[#c6c6c6]">Cycle 42 // Resource Allocation Status</p>
+          <p className="font-mono text-sm text-[#c6c6c6]">Monthly spending limits and remaining funds</p>
         </div>
 
         <div className="flex flex-wrap items-center gap-4">
@@ -100,13 +100,13 @@ export default function BudgetsPage() {
           );
         })}
 
-        {/* Initialize Protocol Dashed Card */}
+        {/* Add Budget Dashed Card */}
         <button className="bg-[#1b1b1b] border-[3px] border-dashed border-[#594043] p-6 hover:bg-[#2a2a2a] transition-colors flex flex-col items-center justify-center min-h-[200px] group cursor-pointer w-full text-left">
           <div className="bg-[#131313] border-[2px] border-black p-3 rounded-full mb-3 group-hover:bg-[#cb2957] group-hover:text-black transition-colors text-[#e1bec2]">
             <span className="material-symbols-outlined text-2xl font-bold">add</span>
           </div>
           <span className="font-space text-lg font-bold uppercase tracking-widest text-[#e1bec2] group-hover:text-white transition-colors">
-            Initialize Protocol
+            Add Budget
           </span>
         </button>
       </div>

@@ -1,4 +1,4 @@
-# 💰 (App Name - Not Decided Yet)
+# 💰 OVERCLOCK
 
 ### Gamified Personal Finance Manager
 

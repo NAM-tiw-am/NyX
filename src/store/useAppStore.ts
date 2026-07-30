@@ -110,6 +110,7 @@ export interface AppState {
   apiStatus: ApiStatus;
   apiError?: string;
   userId?: number;
+  accentColor: string;
 
   // Selected Avatar
   selectedCharacter: Character;
@@ -125,10 +126,14 @@ export interface AppState {
   // Actions
   setAgentName: (name: string) => void;
   setSelectedCharacter: (character: Character) => void;
+  setAccentColor: (color: string) => void;
   toggleCustomCursor: () => void;
   toggleSidebar: () => void;
   setAddTransactionOpen: (open: boolean) => void;
   loadBackendData: () => Promise<void>;
+  loginUser: (username: string) => Promise<boolean>;
+  createCurrentUser: (username: string) => Promise<void>;
+  logout: () => void;
   addTransaction: (tx: Omit<Transaction, 'id'>) => Promise<void>;
   contributeQuest: (questId: string, amount: number) => Promise<void>;
 }
@@ -236,6 +241,26 @@ export const CHARACTERS: Character[] = [
 ];
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://127.0.0.1:8000';
+const STORAGE_USER_ID = 'nyx_user_id';
+const STORAGE_ACCENT = 'nyx_accent_color';
+
+const questImages = [
+  'https://lh3.googleusercontent.com/aida-public/AB6AXuA2i3SHRGOPrU-uS4m1HBKP-mDWj7CCZTDj8NH9QoxKGuv4camlnq8YTEwEgCW3PXy2jeV2sjm6ZfJTHnA297_giP7sX54pEAuQmIQ2b98HGFzEo-MI6dSJ52jERKFZTC_2eyU4WcmyIX1jFRmvtWNRhkghoS8X4KM2hGrSIV9IVNuju8tye8GpptXPpnhxEOpHyeZeN6DfJ0JBYtuE-TRUkmE9dunq4nDZdNigH1D-TJ74OVOChyJtNg',
+  'https://lh3.googleusercontent.com/aida-public/AB6AXuAXf2eaQOemu4A4ukBlG-iY-rPR8fQ4zDU7Z8uBxKN7trI66fXfm6kHi-xzHOMAqcOq1NwlxSVEAm9UJUvCbRRKdrExdmSXsqRIORYDe7AlmGnARKwOAEBx6Xk5WDji2Uhx_FGBMv7pNDj85sERCIiPEhdGeeJZUpBELHtcFxtp88zoemqyauuA-yg7D_GdT0kc1-RxXs5rfLIZerSEj2jGyIsGNjWe_mKG9GvWjydjwLDPAcvywtmWnw',
+  'https://lh3.googleusercontent.com/aida-public/AB6AXuB9lODqDOGXOcFNv9uULdKwY6wiW-CqS6gDf2msVBvkIJG5gfSSgItWzgokEATFWSUFAm41zsyWi2h0GDD7Jh3VDEslsOU2wUulZ64-sQYUyPi1AjMF_EdkUGbRvgz79pMw6pSvKXmNV3vor24uUl2yBQeok6oiGqg9QBfFJJGQRr711edX5CAe_6Xlc02xF2q8BErS3XcsglWoZFxL0z_JNiLCvlACPy0uswrhNa4LxN5kUnbve9yu_g',
+];
+
+const characterClassById: Record<string, string> = {
+  vanguard: 'warrior',
+  pathfinder: 'ranger',
+  ranger: 'ranger',
+  shadow: 'ranger',
+  mystic: 'mage',
+  sorcerer: 'mage',
+  berserker: 'warrior',
+  scholar: 'mage',
+  goblin: 'paladin',
+};
 
 const categoryIcons: Record<string, string> = {
   bills: 'bolt',
@@ -314,10 +339,16 @@ const findCharacterForBackend = (dashboard: { avatar_style?: string; character_c
   );
 };
 
+const applyAccentColor = (color: string) => {
+  if (typeof document === 'undefined') return;
+  document.documentElement.style.setProperty('--primary-container', color);
+  document.documentElement.style.setProperty('--accent-magenta', color);
+};
+
 export const useAppStore = create<AppState>((set) => ({
-  agentName: 'Loading...',
+  agentName: 'Guest',
   agentClass: 'Fiscal Vanguard',
-  level: 1,
+  level: 0,
   xp: 0,
   maxXp: 100,
   streakDays: 0,
@@ -329,6 +360,7 @@ export const useAppStore = create<AppState>((set) => ({
   customCursorEnabled: true,
   isSidebarCollapsed: false,
   apiStatus: 'idle',
+  accentColor: '#cb2957',
 
   selectedCharacter: CHARACTERS[0],
 
@@ -342,6 +374,11 @@ export const useAppStore = create<AppState>((set) => ({
 
   setAgentName: (name) => set({ agentName: name }),
   setSelectedCharacter: (character) => set({ selectedCharacter: character, agentClass: character.classTitle }),
+  setAccentColor: (color) => {
+    if (typeof localStorage !== 'undefined') localStorage.setItem(STORAGE_ACCENT, color);
+    applyAccentColor(color);
+    set({ accentColor: color });
+  },
   toggleCustomCursor: () => set((state) => ({ customCursorEnabled: !state.customCursorEnabled })),
   toggleSidebar: () => set((state) => ({ isSidebarCollapsed: !state.isSidebarCollapsed })),
   setAddTransactionOpen: (open) => set({ isAddTransactionOpen: open }),
@@ -349,8 +386,17 @@ export const useAppStore = create<AppState>((set) => ({
   loadBackendData: async () => {
     try {
       set({ apiStatus: 'loading', apiError: undefined });
-      const bootstrap = await apiFetch<{ user_id: number }>('/demo/bootstrap', { method: 'POST' });
-      const userId = bootstrap.user_id;
+      const storedAccent = typeof localStorage !== 'undefined' ? localStorage.getItem(STORAGE_ACCENT) : null;
+      if (storedAccent) {
+        applyAccentColor(storedAccent);
+        set({ accentColor: storedAccent });
+      }
+      const storedUserId = typeof localStorage !== 'undefined' ? localStorage.getItem(STORAGE_USER_ID) : null;
+      if (!storedUserId) {
+        set({ apiStatus: 'ready' });
+        return;
+      }
+      const userId = Number(storedUserId);
       const [dashboard, expenses, income] = await Promise.all([
         apiFetch<DashboardResponse>(`/users/${userId}/dashboard/`),
         apiFetch<ExpenseResponse[]>(`/users/${userId}/expenses/`),
@@ -411,7 +457,7 @@ export const useAppStore = create<AppState>((set) => ({
             status: usage >= 90 ? 'warning' : usage <= 50 ? 'optimal' : 'normal',
           };
         }),
-        quests: dashboard.active_goals.map((goal) => {
+        quests: dashboard.active_goals.map((goal, index) => {
           const pct = Number(goal.progress_percent);
           return {
             id: String(goal.id),
@@ -419,7 +465,7 @@ export const useAppStore = create<AppState>((set) => ({
             estCompletion: goal.deadline
               ? new Date(`${goal.deadline}T00:00:00`).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }).toUpperCase()
               : 'NO DEADLINE',
-            imageUrl: `/avatars.png`,
+            imageUrl: questImages[index % questImages.length],
             currentAmount: Number(goal.current_amount),
             targetAmount: Number(goal.target_amount),
             status: pct >= 100 ? 'COMPLETED' : pct >= 85 ? 'NEAR COMPLETION' : 'IN PROGRESS',
@@ -433,6 +479,55 @@ export const useAppStore = create<AppState>((set) => ({
         apiError: error instanceof Error ? error.message : 'Unable to load backend data',
       });
     }
+  },
+
+  loginUser: async (username) => {
+    const users = await apiFetch<Array<{ id: number; username: string }>>('/users/');
+    const user = users.find((item) => item.username.toLowerCase() === username.trim().toLowerCase());
+    if (!user) return false;
+    localStorage.setItem(STORAGE_USER_ID, String(user.id));
+    await useAppStore.getState().loadBackendData();
+    return true;
+  },
+
+  createCurrentUser: async (username) => {
+    const state = useAppStore.getState();
+    const user = await apiFetch<{ id: number }>('/users/', {
+      method: 'POST',
+      body: JSON.stringify({
+        username: username.trim(),
+        character_name: username.trim(),
+        character_class: characterClassById[state.selectedCharacter.id] || 'warrior',
+        avatar_style: state.selectedCharacter.id,
+        avatar_color: state.accentColor,
+        weapon_skin: 'starter_kit',
+        armor_skin: 'classic_outfit',
+      }),
+    });
+    localStorage.setItem(STORAGE_USER_ID, String(user.id));
+    localStorage.setItem(STORAGE_ACCENT, state.accentColor);
+    await useAppStore.getState().loadBackendData();
+  },
+
+  logout: () => {
+    if (typeof localStorage !== 'undefined') localStorage.removeItem(STORAGE_USER_ID);
+    set({
+      userId: undefined,
+      agentName: 'Guest',
+      level: 0,
+      xp: 0,
+      maxXp: 100,
+      streakDays: 0,
+      totalBalance: 0,
+      totalIncome: 0,
+      totalExpenses: 0,
+      netSavings: 0,
+      savingsRate: 0,
+      transactions: [],
+      quests: [],
+      budgets: [],
+      apiStatus: 'ready',
+    });
   },
 
   addTransaction: async (tx) => {
@@ -475,12 +570,23 @@ export const useAppStore = create<AppState>((set) => ({
     const state = useAppStore.getState();
     const userId = state.userId;
     const quest = state.quests.find((item) => item.id === questId);
-    if (!userId || !quest) return;
+    if (!userId || !quest || state.totalBalance <= 0) return;
+    const contribution = Math.min(amount, state.totalBalance, quest.targetAmount - quest.currentAmount);
 
     await apiFetch(`/users/${userId}/goals/${questId}`, {
       method: 'PATCH',
       body: JSON.stringify({
-        current_amount: Math.min(quest.targetAmount, quest.currentAmount + amount),
+        current_amount: quest.currentAmount + contribution,
+      }),
+    });
+    await apiFetch(`/users/${userId}/expenses/`, {
+      method: 'POST',
+      body: JSON.stringify({
+        amount: contribution,
+        category: 'goal_purchase',
+        description: `Goal contribution: ${quest.title}`,
+        date_spent: toIsoDate(),
+        is_automated: false,
       }),
     });
 

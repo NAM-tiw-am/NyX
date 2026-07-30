@@ -14,8 +14,8 @@ const mobileTabs = [
 export default function MobileNav() {
   const pathname = usePathname();
 
-  // Hide on Intro & Character Select pages
-  if (pathname === '/' || pathname === '/character-select') return null;
+  // Hide on Intro, Login, and Character Select pages.
+  if (pathname === '/' || pathname === '/login' || pathname === '/character-select') return null;
 
   return (
     <nav className="lg:hidden fixed bottom-0 w-full z-50 flex justify-around items-center px-2 bg-[#131313] border-t-[3px] border-black h-16">

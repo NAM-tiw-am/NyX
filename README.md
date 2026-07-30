@@ -6,7 +6,7 @@
 
 ## 📖 Overview
 
-FinQuest is a modern finance management platform that transforms budgeting and expense tracking into an engaging game-like experience.
+"--------" is a modern finance management platform that transforms budgeting and expense tracking into an engaging game-like experience.
 
 Instead of simply recording expenses, users complete challenges, earn XP, unlock achievements, maintain streaks, level up, and build healthy financial habits.
 
@@ -43,14 +43,6 @@ Build a finance platform where users can:
 ---
 
 # 🚀 Core Features
-
-## Authentication
-
-- Email Login
-- Google OAuth
-- Secure JWT Authentication
-
----
 
 ## Dashboard
 
@@ -116,17 +108,16 @@ Features
 - XP System
 - User Levels
 - Daily Streak
-- Weekly Challenges
-- Monthly Missions
+- Monthly Challenges
 - Achievement Badges
 - Reward Coins
-- Leaderboards
 
 Example Challenges
 
-- No food delivery for 5 days
-- Save $100 this month
+- No food delivery on weekdays
+- Save _Set-amount_ this month
 - Stay under entertainment budget
+- increasing the savings or emergency funds
 - Log expenses for 7 consecutive days
 
 ---

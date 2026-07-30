@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Optional
+from datetime import date
 
 from app.database import get_db
 from app.models import User, IncomeSource
@@ -35,11 +36,22 @@ def add_income(user_id: int, payload: IncomeCreate, db: Session = Depends(get_db
 
 
 @router.get("/", response_model=List[IncomeOut])
-def list_income(user_id: int, db: Session = Depends(get_db)):
+def list_income(
+    user_id: int,
+    from_date: Optional[date] = Query(None, description="Filter from this date (inclusive)"),
+    to_date: Optional[date] = Query(None, description="Filter to this date (inclusive)"),
+    skip: int = Query(0, ge=0, description="Pagination offset"),
+    limit: int = Query(50, ge=1, le=200, description="Max records to return"),
+    db: Session = Depends(get_db),
+):
     _get_user(user_id, db)
-    return db.query(IncomeSource).filter(IncomeSource.user_id == user_id).order_by(
-        IncomeSource.date_received.desc()
-    ).all()
+    query = db.query(IncomeSource).filter(IncomeSource.user_id == user_id)
+    if from_date:
+        query = query.filter(IncomeSource.date_received >= from_date)
+    if to_date:
+        query = query.filter(IncomeSource.date_received <= to_date)
+    return query.order_by(IncomeSource.date_received.desc()).offset(skip).limit(limit).all()
+
 
 
 @router.get("/{income_id}", response_model=IncomeOut)

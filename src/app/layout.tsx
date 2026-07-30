@@ -6,6 +6,7 @@ import MobileNav from '@/components/layout/MobileNav';
 import AddTransactionModal from '@/components/layout/AddTransactionModal';
 import CustomCursor from '@/components/CustomCursor';
 import PageTransition from '@/components/PageTransition';
+import BackendDataProvider from '@/components/BackendDataProvider';
 
 export const metadata: Metadata = {
   title: 'OVERCLOCK — Gamified Personal Finance Manager',
@@ -26,16 +27,18 @@ export default function RootLayout({
         />
       </head>
       <body className="bg-[#131313] text-[#e2e2e2] antialiased selection:bg-[#cb2957] selection:text-white min-h-screen flex flex-col font-inter">
-        <CustomCursor />
-        <TopHeader />
-        <Sidebar />
-        <AddTransactionModal />
+        <BackendDataProvider>
+          <CustomCursor />
+          <TopHeader />
+          <Sidebar />
+          <AddTransactionModal />
 
-        <div className="flex-1 flex flex-col">
-          <PageTransition>{children}</PageTransition>
-        </div>
+          <div className="flex-1 flex flex-col">
+            <PageTransition>{children}</PageTransition>
+          </div>
 
-        <MobileNav />
+          <MobileNav />
+        </BackendDataProvider>
       </body>
     </html>
   );

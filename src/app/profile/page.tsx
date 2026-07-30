@@ -16,7 +16,7 @@ export default function ProfilePage() {
           <h1 className="font-space text-3xl sm:text-5xl font-bold text-white uppercase tracking-tighter mb-2">
             Operative Profile
           </h1>
-          <p className="font-mono text-xs text-[#c6c6c6]">// CLASSIFIED FISCAL VANGUARD DOSSIER</p>
+          <p className="font-mono text-xs text-[#c6c6c6]">{'// CLASSIFIED FISCAL VANGUARD DOSSIER'}</p>
         </div>
 
         {/* Avatar + Level Badge */}
@@ -24,7 +24,7 @@ export default function ProfilePage() {
           <AvatarIcon character={selectedCharacter} size="md" />
           <div>
             <div className="font-space font-bold text-white text-base uppercase">{agentName}</div>
-            <div className="font-mono text-xs text-[#cb2957] font-bold">{selectedCharacter.classTitle} // LVL {level}</div>
+            <div className="font-mono text-xs text-[#cb2957] font-bold">{selectedCharacter.classTitle} {'//'} LVL {level}</div>
           </div>
         </div>
       </header>

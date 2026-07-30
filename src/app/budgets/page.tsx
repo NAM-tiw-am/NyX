@@ -5,6 +5,7 @@ import AvatarIcon from '@/components/ui/AvatarIcon';
 
 export default function BudgetsPage() {
   const { level, selectedCharacter, budgets, isSidebarCollapsed } = useAppStore();
+  const totalRemaining = budgets.reduce((sum, budget) => sum + Math.max(0, budget.limit - budget.spent), 0);
 
   return (
     <main className={`pt-20 lg:pt-8 pb-24 lg:pb-8 p-4 sm:p-8 max-w-7xl mx-auto min-h-screen transition-all duration-300 ${
@@ -32,7 +33,9 @@ export default function BudgetsPage() {
             <div className="font-mono text-[10px] text-[#77da9f] mb-0.5 uppercase tracking-widest font-bold">
               Total Remaining
             </div>
-            <div className="font-space text-2xl font-bold text-white">$1,240.00</div>
+            <div className="font-space text-2xl font-bold text-white">
+              ${totalRemaining.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            </div>
           </div>
         </div>
       </header>

@@ -43,7 +43,7 @@ export default function CharacterSelectPage() {
           <h1 className="font-space text-3xl sm:text-5xl font-bold text-white uppercase tracking-tighter">
             Char_Config
           </h1>
-          <p className="font-mono text-xs text-[#e1bec2] mt-1">// ESTABLISH YOUR DIGITAL IDENTITY</p>
+          <p className="font-mono text-xs text-[#e1bec2] mt-1">{'// ESTABLISH YOUR DIGITAL IDENTITY'}</p>
         </div>
 
         <div className="font-mono text-xs text-[#ffb2bd] flex items-center gap-2 border-[3px] border-black px-3 py-1.5 bg-[#1a1a1a]">

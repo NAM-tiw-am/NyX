@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from typing import List
 
@@ -34,11 +34,16 @@ def add_investment(user_id: int, payload: InvestmentCreate, db: Session = Depend
 
 
 @router.get("/", response_model=List[InvestmentOut])
-def list_investments(user_id: int, db: Session = Depends(get_db)):
+def list_investments(
+    user_id: int,
+    skip: int = Query(0, ge=0, description="Pagination offset"),
+    limit: int = Query(50, ge=1, le=200, description="Max records to return"),
+    db: Session = Depends(get_db),
+):
     _get_user(user_id, db)
     return db.query(Investment).filter(
         Investment.user_id == user_id, Investment.is_active == True
-    ).all()
+    ).offset(skip).limit(limit).all()
 
 
 @router.get("/{investment_id}", response_model=InvestmentOut)

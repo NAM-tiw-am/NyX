@@ -47,16 +47,19 @@ Your financial life, reimagined as an RPG adventure.
     redoc_url="/redoc",
 )
 
-# CORS — allow all origins during development
+# ── CORS ──────────────────────────────────────────────────────────────────────
+# Allows all origins — fine for a hackathon project.
+# For production, replace ["*"] with your frontend URL(s).
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=True,
+    allow_credentials=False,   # must be False when allow_origins=["*"]
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["X-Total-Count"],  # for pagination metadata
 )
 
-# Register all routers
+# ── Routers ───────────────────────────────────────────────────────────────────
 app.include_router(users.router)
 app.include_router(income.router)
 app.include_router(expenses.router)
@@ -70,6 +73,8 @@ app.include_router(achievements_quests.router)
 app.include_router(notifications.router)
 app.include_router(ai.router)
 
+
+# ── Root & Health ─────────────────────────────────────────────────────────────
 
 @app.get("/", tags=["Root"])
 def root():

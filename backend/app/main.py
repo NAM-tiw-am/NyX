@@ -1,15 +1,16 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
 
-from app.config import settings
-from app.database import engine
-from app.database.session import Base
+from backend.config import settings
+from backend.database import engine
+from backend.database.session import Base
 
 # Import all models so Alembic/SQLAlchemy can see them
-import app.models  # noqa: F401
+import backend.models  # noqa: F401
 
 # Routers
-from app.api import (
+from backend.api import (
     users,
     income,
     expenses,
@@ -18,6 +19,7 @@ from app.api import (
     investments,
     insurance,
     dashboard,
+    demo,
     inventory,
     achievements_quests,
     notifications,
@@ -47,6 +49,17 @@ Your financial life, reimagined as an RPG adventure.
     redoc_url="/redoc",
 )
 
+
+class BackendPrefixMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request, call_next):
+        prefix = "/api/backend"
+        if request.scope["path"].startswith(prefix):
+            request.scope["path"] = request.scope["path"][len(prefix):] or "/"
+        return await call_next(request)
+
+
+app.add_middleware(BackendPrefixMiddleware)
+
 # ── CORS ──────────────────────────────────────────────────────────────────────
 # Allows all origins — fine for a hackathon project.
 # For production, replace ["*"] with your frontend URL(s).
@@ -68,6 +81,7 @@ app.include_router(goals.router)
 app.include_router(investments.router)
 app.include_router(insurance.router)
 app.include_router(dashboard.router)
+app.include_router(demo.router)
 app.include_router(inventory.router)
 app.include_router(achievements_quests.router)
 app.include_router(notifications.router)

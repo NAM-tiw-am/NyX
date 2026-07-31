@@ -27,9 +27,9 @@ from app.api import (
 )
 
 app = FastAPI(
-    title="FinQuest API",
+    title="Overclock API",
     description="""
-## 🐉 FinQuest — Gamified Personal Finance RPG
+## 🐉 Overclock — Gamified Personal Finance RPG
 
 Your financial life, reimagined as an RPG adventure.
 
@@ -93,7 +93,7 @@ app.include_router(ai.router)
 @app.get("/", tags=["Root"])
 def root():
     return {
-        "message": "🐉 Welcome to FinQuest API",
+        "message": "🐉 Welcome to Overclock API",
         "docs": "/docs",
         "version": "1.0.0",
         "status": "online",

@@ -1,6 +1,6 @@
 /**
  * src/lib/api.ts
- * Central API client for FinQuest backend.
+ * Central API client for Overclock backend.
  *
  * Usage:
  *   import { getDashboard, addExpense } from '@/lib/api';

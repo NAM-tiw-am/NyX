@@ -1,5 +1,5 @@
 """
-Gamification Engine — The heart of FinQuest's RPG system.
+Gamification Engine — The heart of Overclock's RPG system.
 
 Handles:
 - HP calculation with insurance buffs

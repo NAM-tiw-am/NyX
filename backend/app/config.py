@@ -6,7 +6,7 @@ class Settings(BaseSettings):
     DATABASE_URL: str
     GEMINI_API_KEY: str
     APP_ENV: str = "development"
-    APP_NAME: str = "FinQuest"
+    APP_NAME: str = "Overclock"
 
     class Config:
         env_file = ".env"

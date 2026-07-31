@@ -1,5 +1,5 @@
 """
-Athena AI Service — FinQuest's AI pet powered by Google Gemini.
+Athena AI Service — Overclock's AI companion powered by Google Gemini.
 
 Analyzes user financial data and returns:
 - Spending summary
@@ -23,7 +23,7 @@ from app.config import settings
 client = genai.Client(api_key=settings.GEMINI_API_KEY)
 
 ATHENA_PERSONA = """
-You are Athena, an AI financial companion in a fantasy RPG finance game called FinQuest.
+You are Athena, an AI financial companion in a fantasy RPG finance game called Overclock.
 You are a wise and caring owl-like creature who helps the player manage their finances.
 You speak in a warm, encouraging, slightly whimsical tone — like a mentor in a video game.
 Use occasional light RPG/fantasy metaphors (e.g., "your gold reserves", "your quest for savings").

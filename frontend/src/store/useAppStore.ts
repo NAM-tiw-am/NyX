@@ -54,6 +54,13 @@ export interface Achievement {
   unlocked_at: string | null;
 }
 
+export interface LinkedTool {
+  id: string;
+  name: string;
+  effect: string;
+  icon: string;
+}
+
 export interface AnalyticsDonutSlice {
   name: string;
   value: number;
@@ -182,6 +189,7 @@ export interface AppState {
   quests: Quest[];
   budgets: Budget[];
   achievements: Achievement[];
+  linkedTools: LinkedTool[];
   analyticsDonutData: AnalyticsDonutSlice[];
   analyticsBarData: AnalyticsBarPoint[];
   tacticalInsights: string[];
@@ -198,6 +206,9 @@ export interface AppState {
   setSelectedCharacter: (character: Character) => void;
   setAccentColor: (color: string) => void;
   hydrateDeviceAccent: () => void;
+  hydrateLinkedTools: () => void;
+  addLinkedTool: (tool: Omit<LinkedTool, 'id'>) => void;
+  removeLinkedTool: (id: string) => void;
   toggleCustomCursor: () => void;
   toggleSidebar: () => void;
   setAddTransactionOpen: (open: boolean) => void;
@@ -328,6 +339,7 @@ export const CHARACTERS: Character[] = [
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || '/api/backend';
 const STORAGE_USER_ID = 'nyx_user_id';
 const STORAGE_ACCENT = 'nyx_accent_color';
+const STORAGE_LINKED_TOOLS = 'nyx_linked_tools';
 
 const questImages = [
   'https://lh3.googleusercontent.com/aida-public/AB6AXuA2i3SHRGOPrU-uS4m1HBKP-mDWj7CCZTDj8NH9QoxKGuv4camlnq8YTEwEgCW3PXy2jeV2sjm6ZfJTHnA297_giP7sX54pEAuQmIQ2b98HGFzEo-MI6dSJ52jERKFZTC_2eyU4WcmyIX1jFRmvtWNRhkghoS8X4KM2hGrSIV9IVNuju8tye8GpptXPpnhxEOpHyeZeN6DfJ0JBYtuE-TRUkmE9dunq4nDZdNigH1D-TJ74OVOChyJtNg',
@@ -448,6 +460,27 @@ const applyAccentColor = (color: string) => {
   if (typeof document === 'undefined') return;
   document.documentElement.style.setProperty('--primary-container', color);
   document.documentElement.style.setProperty('--accent-magenta', color);
+};
+
+const readLinkedTools = (): LinkedTool[] => {
+  if (typeof localStorage === 'undefined') return [];
+
+  try {
+    const raw = localStorage.getItem(STORAGE_LINKED_TOOLS);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw) as LinkedTool[];
+    return Array.isArray(parsed)
+      ? parsed.filter((tool) => tool.id && tool.name && tool.effect && tool.icon)
+      : [];
+  } catch {
+    return [];
+  }
+};
+
+const writeLinkedTools = (tools: LinkedTool[]) => {
+  if (typeof localStorage !== 'undefined') {
+    localStorage.setItem(STORAGE_LINKED_TOOLS, JSON.stringify(tools));
+  }
 };
 
 const buildAnalyticsDonutData = (expenses: ExpenseResponse[]): AnalyticsDonutSlice[] => {
@@ -616,6 +649,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   budgets: [],
 
   achievements: [],
+  linkedTools: [],
   analyticsDonutData: [],
   analyticsBarData: [],
   tacticalInsights: [],
@@ -638,6 +672,32 @@ export const useAppStore = create<AppState>((set, get) => ({
     const accentColor = storedAccent || DEFAULT_ACCENT_COLOR;
     applyAccentColor(accentColor);
     set({ accentColor });
+  },
+  hydrateLinkedTools: () => {
+    set({ linkedTools: readLinkedTools() });
+  },
+  addLinkedTool: (tool) => {
+    set((state) => {
+      const linkedTools = [
+        ...state.linkedTools,
+        {
+          ...tool,
+          id: `tool-${Date.now()}`,
+          name: tool.name.trim(),
+          effect: tool.effect.trim(),
+          icon: tool.icon.trim() || 'extension',
+        },
+      ];
+      writeLinkedTools(linkedTools);
+      return { linkedTools };
+    });
+  },
+  removeLinkedTool: (id) => {
+    set((state) => {
+      const linkedTools = state.linkedTools.filter((tool) => tool.id !== id);
+      writeLinkedTools(linkedTools);
+      return { linkedTools };
+    });
   },
   toggleCustomCursor: () => set((state) => ({ customCursorEnabled: !state.customCursorEnabled })),
   toggleSidebar: () => set((state) => ({ isSidebarCollapsed: !state.isSidebarCollapsed })),

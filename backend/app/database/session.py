@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, DeclarativeBase
-from app.config import settings
+from backend.config import settings
 
 
 def _normalize_db_url(url: str) -> str:
@@ -11,6 +11,8 @@ def _normalize_db_url(url: str) -> str:
     - Converts 'postgres://' → 'postgresql+psycopg://' (psycopg3 driver).
     - Converts 'postgresql://' → 'postgresql+psycopg://' (psycopg3 driver).
     """
+    if url.startswith("sqlite"):
+        return url
     if url.startswith("https://") or url.startswith("http://"):
         raise ValueError(
             "\n\n❌  Wrong DATABASE_URL format!\n"
@@ -32,12 +34,18 @@ def _normalize_db_url(url: str) -> str:
 
 _db_url = _normalize_db_url(settings.DATABASE_URL)
 
-engine = create_engine(
-    _db_url,
-    pool_pre_ping=True,
-    pool_size=5,
-    max_overflow=10,
-)
+if _db_url.startswith("sqlite"):
+    engine = create_engine(
+        _db_url,
+        connect_args={"check_same_thread": False},
+    )
+else:
+    engine = create_engine(
+        _db_url,
+        pool_pre_ping=True,
+        pool_size=5,
+        max_overflow=10,
+    )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
@@ -53,4 +61,3 @@ def get_db():
         yield db
     finally:
         db.close()
-

@@ -4,7 +4,7 @@ import { useAppStore } from '@/store/useAppStore';
 import AvatarIcon from '@/components/ui/AvatarIcon';
 
 export default function QuestsPage() {
-  const { level, selectedCharacter, quests, contributeQuest, totalBalance, isSidebarCollapsed } = useAppStore();
+  const { level, selectedCharacter, quests, contributeQuest, totalBalance, isSidebarCollapsed, setAddGoalOpen } = useAppStore();
 
   return (
     <main className={`pt-20 lg:pt-8 pb-24 lg:pb-8 p-4 sm:p-8 max-w-7xl mx-auto min-h-screen transition-all duration-300 ${
@@ -30,7 +30,10 @@ export default function QuestsPage() {
             </span>
           </div>
 
-          <button className="bg-[#ffb2bd] text-black border-[3px] border-black px-5 py-2.5 font-mono text-xs font-bold uppercase brutalist-shadow flex items-center gap-2 whitespace-nowrap hover:bg-white transition-colors">
+          <button
+            onClick={() => setAddGoalOpen(true)}
+            className="bg-[#ffb2bd] text-black border-[3px] border-black px-5 py-2.5 font-mono text-xs font-bold uppercase brutalist-shadow flex items-center gap-2 whitespace-nowrap hover:bg-white transition-colors"
+          >
             <span className="material-symbols-outlined text-sm font-bold">add</span>
             NEW GOAL
           </button>

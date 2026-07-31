@@ -1,7 +1,7 @@
 from datetime import datetime, date
 from typing import Optional
 from pydantic import BaseModel, Field
-from backend.models.user import CharacterClass
+from app.models.user import CharacterClass
 
 
 class CharacterCreate(BaseModel):

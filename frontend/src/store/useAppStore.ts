@@ -4,6 +4,7 @@ export interface Character {
   id: string;
   name: string;
   classTitle: string;
+  imageUrl?: string;
   spriteBgPos: string;
   spriteBgSize: string;
   str: number;
@@ -41,6 +42,31 @@ export interface Budget {
   status: 'normal' | 'warning' | 'optimal';
 }
 
+export interface Achievement {
+  id: number;
+  name: string;
+  description: string;
+  icon: string;
+  rarity: string;
+  xp_reward: number;
+  gold_reward: number;
+  unlocked: boolean;
+  unlocked_at: string | null;
+}
+
+export interface AnalyticsDonutSlice {
+  name: string;
+  value: number;
+  amount: number;
+  color: string;
+}
+
+export interface AnalyticsBarPoint {
+  quarter: string;
+  Inflow: number;
+  Outflow: number;
+}
+
 export type ApiStatus = 'idle' | 'loading' | 'ready' | 'error';
 
 interface DashboardBudgetResponse {
@@ -72,6 +98,7 @@ interface DashboardResponse {
   total_expenses: number;
   net_savings: number;
   savings_rate: number;
+  investment_profit_loss: number;
   budgets: DashboardBudgetResponse[];
   active_goals: DashboardGoalResponse[];
 }
@@ -90,6 +117,21 @@ interface IncomeResponse {
   amount: number;
   income_type: string;
   date_received: string;
+}
+
+interface AchievementDefinitionResponse {
+  id: number;
+  name: string;
+  description: string;
+  icon: string;
+  rarity: string;
+  xp_reward: number;
+  gold_reward: number;
+}
+
+interface UserAchievementResponse {
+  achievement: AchievementDefinitionResponse;
+  unlocked_at: string;
 }
 
 export interface AppState {
@@ -119,9 +161,15 @@ export interface AppState {
   transactions: Transaction[];
   quests: Quest[];
   budgets: Budget[];
+  achievements: Achievement[];
+  analyticsDonutData: AnalyticsDonutSlice[];
+  analyticsBarData: AnalyticsBarPoint[];
+  tacticalInsights: string[];
 
   // Modals / Triggers
   isAddTransactionOpen: boolean;
+  isAddBudgetOpen: boolean;
+  isAddGoalOpen: boolean;
 
   // Actions
   setAgentName: (name: string) => void;
@@ -130,11 +178,15 @@ export interface AppState {
   toggleCustomCursor: () => void;
   toggleSidebar: () => void;
   setAddTransactionOpen: (open: boolean) => void;
+  setAddBudgetOpen: (open: boolean) => void;
+  setAddGoalOpen: (open: boolean) => void;
   loadBackendData: () => Promise<void>;
   loginUser: (username: string) => Promise<boolean>;
   createCurrentUser: (username: string) => Promise<void>;
   logout: () => void;
   addTransaction: (tx: Omit<Transaction, 'id'>) => Promise<void>;
+  createBudget: (data: { category: string; monthly_limit: number; month: number; year: number }) => Promise<void>;
+  createGoal: (data: { name: string; target_amount: number; deadline?: string; icon?: string }) => Promise<void>;
   contributeQuest: (questId: string, amount: number) => Promise<void>;
 }
 
@@ -143,6 +195,7 @@ export const CHARACTERS: Character[] = [
     id: 'vanguard',
     name: 'VANGUARD',
     classTitle: 'Fiscal Vanguard',
+    imageUrl: '/characters/vanguard.png',
     spriteBgPos: '4% 1%',
     spriteBgSize: '360% 360%',
     str: 85,
@@ -154,6 +207,7 @@ export const CHARACTERS: Character[] = [
     id: 'pathfinder',
     name: 'PATHFINDER',
     classTitle: 'Torch Navigator',
+    imageUrl: '/characters/pathfinder.png',
     spriteBgPos: '50% 1%',
     spriteBgSize: '360% 360%',
     str: 70,
@@ -165,6 +219,7 @@ export const CHARACTERS: Character[] = [
     id: 'ranger',
     name: 'RANGER',
     classTitle: 'Asset Archer',
+    imageUrl: '/characters/ranger.png',
     spriteBgPos: '96% 1%',
     spriteBgSize: '360% 360%',
     str: 75,
@@ -176,6 +231,7 @@ export const CHARACTERS: Character[] = [
     id: 'shadow',
     name: 'SHADOW',
     classTitle: 'Ledger Operative',
+    imageUrl: '/characters/shadow.png',
     spriteBgPos: '4% 48%',
     spriteBgSize: '360% 360%',
     str: 65,
@@ -187,6 +243,7 @@ export const CHARACTERS: Character[] = [
     id: 'mystic',
     name: 'MYSTIC',
     classTitle: 'Yield Witch',
+    imageUrl: '/characters/mystic.png',
     spriteBgPos: '50% 48%',
     spriteBgSize: '360% 360%',
     str: 60,
@@ -198,6 +255,7 @@ export const CHARACTERS: Character[] = [
     id: 'sorcerer',
     name: 'SORCERER',
     classTitle: 'Capital Mage',
+    imageUrl: '/characters/sorcerer.png',
     spriteBgPos: '96% 48%',
     spriteBgSize: '360% 360%',
     str: 55,
@@ -209,6 +267,7 @@ export const CHARACTERS: Character[] = [
     id: 'berserker',
     name: 'BERSERKER',
     classTitle: 'Debt Destroyer',
+    imageUrl: '/characters/berserker.png',
     spriteBgPos: '4% 96%',
     spriteBgSize: '360% 360%',
     str: 95,
@@ -220,6 +279,7 @@ export const CHARACTERS: Character[] = [
     id: 'scholar',
     name: 'SCHOLAR',
     classTitle: 'Vault Monk',
+    imageUrl: '/characters/scholar.png',
     spriteBgPos: '50% 96%',
     spriteBgSize: '360% 360%',
     str: 50,
@@ -231,6 +291,7 @@ export const CHARACTERS: Character[] = [
     id: 'goblin',
     name: 'GOBLIN',
     classTitle: 'Coin Hoarder',
+    imageUrl: '/characters/goblin.png',
     spriteBgPos: '96% 96%',
     spriteBgSize: '360% 360%',
     str: 80,
@@ -292,6 +353,19 @@ const categoryLabels: Record<string, string> = {
   other: 'Other',
 };
 
+const categoryAnalyticsColors = [
+  '#cb2957',
+  '#77da9f',
+  '#c6c6c6',
+  '#ffb2bd',
+  '#f7b731',
+  '#3867d6',
+  '#00b894',
+  '#8e44ad',
+  '#e17055',
+  '#74b9ff',
+];
+
 const expenseCategoryByLabel: Record<string, string> = {
   Groceries: 'food',
   Salary: 'other',
@@ -302,6 +376,13 @@ const expenseCategoryByLabel: Record<string, string> = {
 };
 
 const toIsoDate = () => new Date().toISOString().slice(0, 10);
+
+const monthKey = (value: string) => {
+  const date = new Date(`${value}T00:00:00`);
+  const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+  const label = date.toLocaleDateString('en-US', { month: 'short' }).toUpperCase();
+  return { key, label };
+};
 
 const formatDate = (value: string) => {
   const date = new Date(`${value}T00:00:00`);
@@ -345,6 +426,110 @@ const applyAccentColor = (color: string) => {
   document.documentElement.style.setProperty('--accent-magenta', color);
 };
 
+const buildAnalyticsDonutData = (expenses: ExpenseResponse[]): AnalyticsDonutSlice[] => {
+  const totals = expenses.reduce<Record<string, number>>((acc, expense) => {
+    acc[expense.category] = (acc[expense.category] || 0) + Number(expense.amount);
+    return acc;
+  }, {});
+  const total = Object.values(totals).reduce((sum, amount) => sum + amount, 0);
+
+  if (total <= 0) return [];
+
+  return Object.entries(totals)
+    .sort(([, a], [, b]) => b - a)
+    .map(([category, amount], index) => ({
+      name: (categoryLabels[category] || category).toUpperCase(),
+      value: Math.round((amount / total) * 100),
+      amount,
+      color: categoryAnalyticsColors[index % categoryAnalyticsColors.length],
+    }));
+};
+
+const buildAnalyticsBarData = (expenses: ExpenseResponse[], income: IncomeResponse[]): AnalyticsBarPoint[] => {
+  const monthly = new Map<string, AnalyticsBarPoint>();
+
+  const ensureMonth = (value: string) => {
+    const { key, label } = monthKey(value);
+    if (!monthly.has(key)) {
+      monthly.set(key, { quarter: label, Inflow: 0, Outflow: 0 });
+    }
+    return monthly.get(key)!;
+  };
+
+  income.forEach((item) => {
+    ensureMonth(item.date_received).Inflow += Number(item.amount);
+  });
+  expenses.forEach((expense) => {
+    ensureMonth(expense.date_spent).Outflow += Number(expense.amount);
+  });
+
+  return Array.from(monthly.entries())
+    .sort(([a], [b]) => a.localeCompare(b))
+    .slice(-6)
+    .map(([, point]) => ({
+      ...point,
+      Inflow: Number(point.Inflow.toFixed(2)),
+      Outflow: Number(point.Outflow.toFixed(2)),
+    }));
+};
+
+const buildTacticalInsights = (
+  dashboard: DashboardResponse,
+  income: IncomeResponse[],
+  budgets: Budget[],
+  quests: Quest[],
+  donutData: AnalyticsDonutSlice[],
+  barData: AnalyticsBarPoint[]
+) => {
+  const insights: string[] = [];
+  const largestCategory = donutData[0];
+  const exceededBudget = budgets.find((budget) => budget.spent > budget.limit);
+  const bestGoal = quests
+    .filter((quest) => quest.targetAmount > 0)
+    .map((quest) => ({ title: quest.title, progress: (quest.currentAmount / quest.targetAmount) * 100 }))
+    .sort((a, b) => b.progress - a.progress)[0];
+  const highestExpenseMonth = [...barData].sort((a, b) => b.Outflow - a.Outflow)[0];
+  const highestIncomeMonth = [...barData].sort((a, b) => b.Inflow - a.Inflow)[0];
+
+  if (largestCategory) {
+    insights.push(`Largest spending category is ${largestCategory.name} at ${largestCategory.value}% of logged expenses.`);
+  } else {
+    insights.push('No expenses logged yet; resource allocation will activate after the first expense.');
+  }
+
+  insights.push(
+    `Net cash flow is ${dashboard.net_savings >= 0 ? 'positive' : 'negative'} at $${Math.abs(dashboard.net_savings).toLocaleString('en-US', { maximumFractionDigits: 2 })}, with a ${dashboard.savings_rate.toFixed(1)}% savings rate.`
+  );
+
+  if (exceededBudget) {
+    insights.push(`${exceededBudget.category} budget is exceeded by $${(exceededBudget.spent - exceededBudget.limit).toLocaleString('en-US', { maximumFractionDigits: 2 })}.`);
+  } else if (budgets.length) {
+    insights.push('No current budgets are exceeded.');
+  } else {
+    insights.push('No budgets configured yet; add a budget to unlock limit tracking.');
+  }
+
+  if (highestExpenseMonth && highestExpenseMonth.Outflow > 0) {
+    insights.push(`Highest expense month in the current history is ${highestExpenseMonth.quarter} at $${highestExpenseMonth.Outflow.toLocaleString('en-US', { maximumFractionDigits: 2 })}.`);
+  }
+
+  if (highestIncomeMonth && highestIncomeMonth.Inflow > 0 && income.length) {
+    insights.push(`Highest income month in the current history is ${highestIncomeMonth.quarter} at $${highestIncomeMonth.Inflow.toLocaleString('en-US', { maximumFractionDigits: 2 })}.`);
+  }
+
+  if (bestGoal) {
+    insights.push(`${bestGoal.title} is the leading goal at ${Math.round(bestGoal.progress)}% progress.`);
+  } else {
+    insights.push('No active goals available for progress analysis.');
+  }
+
+  if (dashboard.investment_profit_loss !== 0) {
+    insights.push(`Investment growth is ${dashboard.investment_profit_loss >= 0 ? 'up' : 'down'} $${Math.abs(dashboard.investment_profit_loss).toLocaleString('en-US', { maximumFractionDigits: 2 })}.`);
+  }
+
+  return insights.slice(0, 5);
+};
+
 export const useAppStore = create<AppState>((set) => ({
   agentName: 'Guest',
   agentClass: 'Fiscal Vanguard',
@@ -370,7 +555,14 @@ export const useAppStore = create<AppState>((set) => ({
 
   budgets: [],
 
+  achievements: [],
+  analyticsDonutData: [],
+  analyticsBarData: [],
+  tacticalInsights: [],
+
   isAddTransactionOpen: false,
+  isAddBudgetOpen: false,
+  isAddGoalOpen: false,
 
   setAgentName: (name) => set({ agentName: name }),
   setSelectedCharacter: (character) => set({ selectedCharacter: character, agentClass: character.classTitle }),
@@ -382,6 +574,8 @@ export const useAppStore = create<AppState>((set) => ({
   toggleCustomCursor: () => set((state) => ({ customCursorEnabled: !state.customCursorEnabled })),
   toggleSidebar: () => set((state) => ({ isSidebarCollapsed: !state.isSidebarCollapsed })),
   setAddTransactionOpen: (open) => set({ isAddTransactionOpen: open }),
+  setAddBudgetOpen: (open) => set({ isAddBudgetOpen: open }),
+  setAddGoalOpen: (open) => set({ isAddGoalOpen: open }),
 
   loadBackendData: async () => {
     try {
@@ -397,13 +591,23 @@ export const useAppStore = create<AppState>((set) => ({
         return;
       }
       const userId = Number(storedUserId);
-      const [dashboard, expenses, income] = await Promise.all([
+      const [dashboard, expenses, income, achievementDefinitions, unlockedAchievements] = await Promise.all([
         apiFetch<DashboardResponse>(`/users/${userId}/dashboard/`),
         apiFetch<ExpenseResponse[]>(`/users/${userId}/expenses/`),
         apiFetch<IncomeResponse[]>(`/users/${userId}/income/`),
+        apiFetch<AchievementDefinitionResponse[]>('/achievements'),
+        apiFetch<UserAchievementResponse[]>(`/users/${userId}/achievements`),
       ]);
 
       const selectedCharacter = findCharacterForBackend(dashboard);
+      const unlockedById = new Map(
+        unlockedAchievements.map((item) => [item.achievement.id, item.unlocked_at])
+      );
+      const achievements = achievementDefinitions.map((achievement) => ({
+        ...achievement,
+        unlocked: unlockedById.has(achievement.id),
+        unlocked_at: unlockedById.get(achievement.id) || null,
+      }));
       const debitTransactions: Transaction[] = expenses.map((expense) => ({
         id: `expense-${expense.id}`,
         icon: categoryIcons[expense.category] || 'shopping_cart',
@@ -430,6 +634,41 @@ export const useAppStore = create<AppState>((set) => ({
         if (b.date === 'Yesterday') return 1;
         return 0;
       });
+      const budgets = dashboard.budgets.map((budget) => {
+        const usage = Number(budget.usage_percent);
+        return {
+          id: String(budget.id),
+          category: categoryLabels[budget.category] || budget.category,
+          icon: categoryIcons[budget.category] || 'account_balance_wallet',
+          spent: Number(budget.current_spent),
+          limit: Number(budget.monthly_limit),
+          status: usage >= 90 ? 'warning' as const : usage <= 50 ? 'optimal' as const : 'normal' as const,
+        };
+      });
+      const quests = dashboard.active_goals.map((goal, index) => {
+        const pct = Number(goal.progress_percent);
+        return {
+          id: String(goal.id),
+          title: goal.name,
+          estCompletion: goal.deadline
+            ? new Date(`${goal.deadline}T00:00:00`).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }).toUpperCase()
+            : 'NO DEADLINE',
+          imageUrl: questImages[index % questImages.length],
+          currentAmount: Number(goal.current_amount),
+          targetAmount: Number(goal.target_amount),
+          status: pct >= 100 ? 'COMPLETED' as const : pct >= 85 ? 'NEAR COMPLETION' as const : 'IN PROGRESS' as const,
+        };
+      });
+      const analyticsDonutData = buildAnalyticsDonutData(expenses);
+      const analyticsBarData = buildAnalyticsBarData(expenses, income);
+      const tacticalInsights = buildTacticalInsights(
+        dashboard,
+        income,
+        budgets,
+        quests,
+        analyticsDonutData,
+        analyticsBarData
+      );
 
       set({
         userId,
@@ -446,31 +685,12 @@ export const useAppStore = create<AppState>((set) => ({
         savingsRate: dashboard.savings_rate,
         selectedCharacter,
         transactions,
-        budgets: dashboard.budgets.map((budget) => {
-          const usage = Number(budget.usage_percent);
-          return {
-            id: String(budget.id),
-            category: categoryLabels[budget.category] || budget.category,
-            icon: categoryIcons[budget.category] || 'account_balance_wallet',
-            spent: Number(budget.current_spent),
-            limit: Number(budget.monthly_limit),
-            status: usage >= 90 ? 'warning' : usage <= 50 ? 'optimal' : 'normal',
-          };
-        }),
-        quests: dashboard.active_goals.map((goal, index) => {
-          const pct = Number(goal.progress_percent);
-          return {
-            id: String(goal.id),
-            title: goal.name,
-            estCompletion: goal.deadline
-              ? new Date(`${goal.deadline}T00:00:00`).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }).toUpperCase()
-              : 'NO DEADLINE',
-            imageUrl: questImages[index % questImages.length],
-            currentAmount: Number(goal.current_amount),
-            targetAmount: Number(goal.target_amount),
-            status: pct >= 100 ? 'COMPLETED' : pct >= 85 ? 'NEAR COMPLETION' : 'IN PROGRESS',
-          };
-        }),
+        achievements,
+        budgets,
+        quests,
+        analyticsDonutData,
+        analyticsBarData,
+        tacticalInsights,
         apiStatus: 'ready',
       });
     } catch (error) {
@@ -526,6 +746,10 @@ export const useAppStore = create<AppState>((set) => ({
       transactions: [],
       quests: [],
       budgets: [],
+      achievements: [],
+      analyticsDonutData: [],
+      analyticsBarData: [],
+      tacticalInsights: [],
       apiStatus: 'ready',
     });
   },
@@ -562,6 +786,38 @@ export const useAppStore = create<AppState>((set) => ({
         }),
       });
     }
+
+    await useAppStore.getState().loadBackendData();
+  },
+
+  createBudget: async (data) => {
+    const state = useAppStore.getState();
+    if (!state.userId) {
+      await state.loadBackendData();
+    }
+    const userId = useAppStore.getState().userId;
+    if (!userId) return;
+
+    await apiFetch(`/users/${userId}/budgets/`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+
+    await useAppStore.getState().loadBackendData();
+  },
+
+  createGoal: async (data) => {
+    const state = useAppStore.getState();
+    if (!state.userId) {
+      await state.loadBackendData();
+    }
+    const userId = useAppStore.getState().userId;
+    if (!userId) return;
+
+    await apiFetch(`/users/${userId}/goals/`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
 
     await useAppStore.getState().loadBackendData();
   },

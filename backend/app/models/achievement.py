@@ -2,7 +2,7 @@ import enum
 from datetime import datetime
 from sqlalchemy import Column, Integer, String, Float, Boolean, DateTime, Enum, ForeignKey, Text
 from sqlalchemy.orm import relationship
-from backend.database.session import Base
+from app.database.session import Base
 
 
 class AchievementCondition(str, enum.Enum):

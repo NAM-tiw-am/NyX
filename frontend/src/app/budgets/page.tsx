@@ -4,7 +4,7 @@ import { useAppStore } from '@/store/useAppStore';
 import AvatarIcon from '@/components/ui/AvatarIcon';
 
 export default function BudgetsPage() {
-  const { level, selectedCharacter, budgets, isSidebarCollapsed } = useAppStore();
+  const { level, selectedCharacter, budgets, isSidebarCollapsed, setAddBudgetOpen } = useAppStore();
   const totalRemaining = budgets.reduce((sum, budget) => sum + Math.max(0, budget.limit - budget.spent), 0);
 
   return (
@@ -101,7 +101,10 @@ export default function BudgetsPage() {
         })}
 
         {/* Add Budget Dashed Card */}
-        <button className="bg-[#1b1b1b] border-[3px] border-dashed border-[#594043] p-6 hover:bg-[#2a2a2a] transition-colors flex flex-col items-center justify-center min-h-[200px] group cursor-pointer w-full text-left">
+        <button
+          onClick={() => setAddBudgetOpen(true)}
+          className="bg-[#1b1b1b] border-[3px] border-dashed border-[#594043] p-6 hover:bg-[#2a2a2a] transition-colors flex flex-col items-center justify-center min-h-[200px] group cursor-pointer w-full text-left"
+        >
           <div className="bg-[#131313] border-[2px] border-black p-3 rounded-full mb-3 group-hover:bg-[#cb2957] group-hover:text-black transition-colors text-[#e1bec2]">
             <span className="material-symbols-outlined text-2xl font-bold">add</span>
           </div>

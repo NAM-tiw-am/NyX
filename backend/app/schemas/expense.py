@@ -1,7 +1,7 @@
 from datetime import date, datetime
 from typing import Optional
 from pydantic import BaseModel, Field
-from backend.models.expense import ExpenseCategory
+from app.models.expense import ExpenseCategory
 
 
 class ExpenseCreate(BaseModel):

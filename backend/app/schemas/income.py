@@ -1,7 +1,7 @@
 from datetime import date, datetime
 from typing import Optional
 from pydantic import BaseModel, Field
-from backend.models.income import IncomeType
+from app.models.income import IncomeType
 
 
 class IncomeCreate(BaseModel):

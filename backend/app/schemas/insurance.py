@@ -1,7 +1,7 @@
 from datetime import date, datetime
 from typing import Optional
 from pydantic import BaseModel, Field
-from backend.models.insurance import InsuranceType
+from app.models.insurance import InsuranceType
 
 
 class InsuranceCreate(BaseModel):

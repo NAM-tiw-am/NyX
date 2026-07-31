@@ -16,8 +16,8 @@ from pydantic import BaseModel
 from google import genai
 from google.genai import types
 
-from backend.models.user import User
-from backend.config import settings
+from app.models.user import User
+from app.config import settings
 
 # Initialize the new SDK client
 client = genai.Client(api_key=settings.GEMINI_API_KEY)

@@ -15,7 +15,7 @@ import random
 from datetime import date, datetime
 from sqlalchemy.orm import Session
 
-from backend.models import (
+from app.models import (
     User, Expense, IncomeSource, Insurance, InsuranceType,
     INSURANCE_BUFFS, CATEGORY_HP_DAMAGE, ExpenseCategory,
     Achievement, UserAchievement, AchievementCondition,
@@ -278,7 +278,7 @@ def check_achievements(user: User, db: Session) -> list[dict]:
     expense_count = db.query(Expense).filter(Expense.user_id == user.id).count()
     income_count = db.query(IncomeSource).filter(IncomeSource.user_id == user.id).count()
 
-    from backend.models import SavingsGoal, Investment, Insurance as InsuranceModel
+    from app.models import SavingsGoal, Investment, Insurance as InsuranceModel
     goals_completed = db.query(SavingsGoal).filter(
         SavingsGoal.user_id == user.id, SavingsGoal.is_completed == True
     ).count()
@@ -338,7 +338,7 @@ def update_challenge_progress(user: User, db: Session, trigger: str = None):
     if not challenge:
         return
 
-    from backend.models import SavingsGoal, Expense as ExpenseModel, IncomeSource as IncomeModel
+    from app.models import SavingsGoal, Expense as ExpenseModel, IncomeSource as IncomeModel
 
     if challenge.target_type == ChallengeTargetType.STREAK_DAYS:
         challenge.current_value = user.streak_count

@@ -1,8 +1,8 @@
 from datetime import datetime, date
 from typing import Optional, List, Any
 from pydantic import BaseModel
-from backend.models.inventory import ItemType, ItemRarity
-from backend.models.notification import NotificationType
+from app.models.inventory import ItemType, ItemRarity
+from app.models.notification import NotificationType
 
 
 # ── Inventory ──────────────────────────────────

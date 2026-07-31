@@ -20,16 +20,25 @@ export default function AvatarIcon({ character, size = 'md', className = '' }: A
     <div
       className={`${sizeClasses[size]} border-black bg-[#131313] shrink-0 overflow-hidden relative shadow-[2px_2px_0px_0px_#000] ${className}`}
     >
-      <div
-        className="w-full h-full"
-        style={{
-          backgroundImage: `url('/avatars.png')`,
-          backgroundSize: character.spriteBgSize || '330% 330%',
-          backgroundPosition: character.spriteBgPos || '0% 0%',
-          backgroundRepeat: 'no-repeat',
-          imageRendering: 'pixelated',
-        }}
-      />
+      {character.imageUrl ? (
+        <img
+          src={character.imageUrl}
+          alt={character.name}
+          className="w-full h-full object-contain"
+          style={{ imageRendering: 'pixelated' }}
+        />
+      ) : (
+        <div
+          className="w-full h-full"
+          style={{
+            backgroundImage: `url('/avatars.png')`,
+            backgroundSize: character.spriteBgSize || '330% 330%',
+            backgroundPosition: character.spriteBgPos || '0% 0%',
+            backgroundRepeat: 'no-repeat',
+            imageRendering: 'pixelated',
+          }}
+        />
+      )}
     </div>
   );
 }

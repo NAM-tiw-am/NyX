@@ -3,8 +3,8 @@ from datetime import date, timedelta
 from fastapi import APIRouter
 from sqlalchemy.orm import Session
 
-from backend.database import Base, SessionLocal, engine
-from backend.models import (
+from app.database import Base, SessionLocal, engine
+from app.models import (
     Achievement,
     Budget,
     BudgetCategory,

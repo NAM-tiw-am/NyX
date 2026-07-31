@@ -4,6 +4,8 @@ import Sidebar from '@/components/layout/Sidebar';
 import TopHeader from '@/components/layout/TopHeader';
 import MobileNav from '@/components/layout/MobileNav';
 import AddTransactionModal from '@/components/layout/AddTransactionModal';
+import AddBudgetModal from '@/components/layout/AddBudgetModal';
+import AddGoalModal from '@/components/layout/AddGoalModal';
 import CustomCursor from '@/components/CustomCursor';
 import PageTransition from '@/components/PageTransition';
 import BackendDataProvider from '@/components/BackendDataProvider';
@@ -32,6 +34,8 @@ export default function RootLayout({
           <TopHeader />
           <Sidebar />
           <AddTransactionModal />
+          <AddBudgetModal />
+          <AddGoalModal />
 
           <div className="flex-1 flex flex-col">
             <PageTransition>{children}</PageTransition>

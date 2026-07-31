@@ -1,7 +1,7 @@
 from datetime import datetime, date
 from sqlalchemy import Column, Integer, String, Float, Boolean, DateTime, Date, ForeignKey, Text
 from sqlalchemy.orm import relationship
-from backend.database.session import Base
+from app.database.session import Base
 
 
 class SavingsGoal(Base):

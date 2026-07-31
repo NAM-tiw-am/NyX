@@ -1,7 +1,7 @@
 from datetime import date, datetime
 from typing import Optional
 from pydantic import BaseModel, Field
-from backend.models.budget import BudgetCategory
+from app.models.budget import BudgetCategory
 
 
 class BudgetCreate(BaseModel):

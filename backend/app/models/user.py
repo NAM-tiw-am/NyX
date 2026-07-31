@@ -5,7 +5,7 @@ from sqlalchemy import (
     DateTime, Date, Enum, ForeignKey, Text
 )
 from sqlalchemy.orm import relationship
-from backend.database.session import Base
+from app.database.session import Base
 
 
 class CharacterClass(str, enum.Enum):

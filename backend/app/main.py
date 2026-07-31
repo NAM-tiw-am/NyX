@@ -2,15 +2,15 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
 
-from backend.config import settings
-from backend.database import engine
-from backend.database.session import Base
+from app.config import settings
+from app.database import engine
+from app.database.session import Base
 
 # Import all models so Alembic/SQLAlchemy can see them
-import backend.models  # noqa: F401
+import app.models  # noqa: F401
 
-# Routers
-from backend.api import (
+# API routers
+from app.api import (
     users,
     income,
     expenses,
@@ -19,11 +19,11 @@ from backend.api import (
     investments,
     insurance,
     dashboard,
-    demo,
     inventory,
     achievements_quests,
     notifications,
     ai,
+    demo,
 )
 
 app = FastAPI(

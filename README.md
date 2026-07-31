@@ -133,7 +133,7 @@ The analytics module provides:
 ### Clone the Repository
 
 ```bash
-git clone https://github.com/<your-username>/<repo-name>.git
+git clone https://github.com/NAM-tiw-am/Team-NyX---Moksh-berawala.git
 ```
 
 ### Frontend

@@ -1,6 +1,8 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
+import { useEffect } from 'react';
 import { useAppStore } from '@/store/useAppStore';
 import AvatarIcon from '@/components/ui/AvatarIcon';
 
@@ -18,8 +20,18 @@ export default function DashboardPage() {
     transactions,
     quests,
     setAddTransactionOpen,
+    userId,
+    athenaInsight,
+    isAthenaInsightLoading,
+    loadAthenaInsight,
     isSidebarCollapsed
   } = useAppStore();
+
+  useEffect(() => {
+    if (userId && !athenaInsight && !isAthenaInsightLoading) {
+      void loadAthenaInsight();
+    }
+  }, [athenaInsight, isAthenaInsightLoading, loadAthenaInsight, userId]);
 
   return (
     <main className={`pt-20 lg:pt-8 pb-24 lg:pb-8 p-4 sm:p-8 max-w-7xl mx-auto min-h-screen transition-all duration-300 ${
@@ -65,15 +77,24 @@ export default function DashboardPage() {
 
       {/* AI Intelligence Alert Banner */}
       <div className="mb-8 bg-[#1a1a1a] border-[3px] border-black p-5 brutalist-shadow flex gap-4 items-start border-l-[8px] border-l-[#ffb4ab]">
-        <div className="bg-[#93000a] text-white p-2 border-[2px] border-black shrink-0">
-          <span className="material-symbols-outlined">warning</span>
+        <div className="bg-[#93000a] text-white p-1 border-[2px] border-black shrink-0 w-14 h-14 flex items-center justify-center">
+          <Image
+            src="/athena/athena.png"
+            alt="Athena"
+            width={48}
+            height={48}
+            className="object-contain [image-rendering:pixelated]"
+            priority
+          />
         </div>
         <div>
           <h3 className="font-mono text-xs font-bold text-[#ffb4ab] uppercase mb-1">
             Athena Insight
           </h3>
           <p className="text-sm text-[#e2e2e2] font-inter">
-            Review this week&apos;s spending and move surplus funds toward your priority goals.
+            {isAthenaInsightLoading
+              ? 'Athena is reading your spend, behavior, and past experience...'
+              : athenaInsight || 'Athena will share spend, behavior, and past-experience insights after your financial logs are ready.'}
           </p>
         </div>
       </div>

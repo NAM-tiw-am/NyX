@@ -69,6 +69,8 @@ export interface AnalyticsBarPoint {
 
 export type ApiStatus = 'idle' | 'loading' | 'ready' | 'error';
 
+const DEFAULT_ACCENT_COLOR = '#cb2957';
+
 interface DashboardBudgetResponse {
   id: number;
   category: string;
@@ -134,6 +136,24 @@ interface UserAchievementResponse {
   unlocked_at: string;
 }
 
+interface MonthlyReportResponse {
+  ai_summary?: string | null;
+  spending_insights?: string[] | null;
+  saving_suggestions?: string[] | null;
+  budget_recommendations?: string[] | null;
+}
+
+interface AthenaAnalysisResponse {
+  success: boolean;
+  data?: {
+    athena_message?: string;
+    spending_summary?: string;
+    monthly_insights?: string[];
+    saving_suggestions?: string[];
+    quest_tip?: string;
+  };
+}
+
 export interface AppState {
   // User & Level Info
   agentName: string;
@@ -165,6 +185,8 @@ export interface AppState {
   analyticsDonutData: AnalyticsDonutSlice[];
   analyticsBarData: AnalyticsBarPoint[];
   tacticalInsights: string[];
+  athenaInsight: string;
+  isAthenaInsightLoading: boolean;
 
   // Modals / Triggers
   isAddTransactionOpen: boolean;
@@ -175,6 +197,7 @@ export interface AppState {
   setAgentName: (name: string) => void;
   setSelectedCharacter: (character: Character) => void;
   setAccentColor: (color: string) => void;
+  hydrateDeviceAccent: () => void;
   toggleCustomCursor: () => void;
   toggleSidebar: () => void;
   setAddTransactionOpen: (open: boolean) => void;
@@ -183,6 +206,7 @@ export interface AppState {
   loadBackendData: () => Promise<void>;
   loginUser: (username: string) => Promise<boolean>;
   createCurrentUser: (username: string) => Promise<void>;
+  loadAthenaInsight: () => Promise<void>;
   logout: () => void;
   addTransaction: (tx: Omit<Transaction, 'id'>) => Promise<void>;
   createBudget: (data: { category: string; monthly_limit: number; month: number; year: number }) => Promise<void>;
@@ -530,7 +554,43 @@ const buildTacticalInsights = (
   return insights.slice(0, 5);
 };
 
-export const useAppStore = create<AppState>((set) => ({
+const buildAthenaInsightFromReport = (report: MonthlyReportResponse) => {
+  const parts = [
+    report.ai_summary,
+    report.spending_insights?.[0],
+    report.saving_suggestions?.[0],
+    report.budget_recommendations?.[0],
+  ].filter(Boolean);
+
+  return parts.length ? `Athena says: ${parts.slice(0, 2).join(' ')}` : '';
+};
+
+const buildAthenaInsightFromAnalysis = (analysis: AthenaAnalysisResponse) => {
+  const data = analysis.data;
+  if (!data) return '';
+
+  return (
+    data.athena_message ||
+    [data.spending_summary, data.monthly_insights?.[0], data.saving_suggestions?.[0], data.quest_tip]
+      .filter(Boolean)
+      .slice(0, 2)
+      .join(' ')
+  );
+};
+
+const buildLocalAthenaInsight = (state: AppState) => {
+  if (state.tacticalInsights.length) {
+    return `Athena says: ${state.tacticalInsights[0]}`;
+  }
+
+  if (state.totalIncome || state.totalExpenses || state.quests.length) {
+    return `Athena says: net cash flow is $${state.netSavings.toLocaleString('en-US', { maximumFractionDigits: 2 })} with a ${state.savingsRate.toFixed(1)}% savings rate.`;
+  }
+
+  return 'Athena will share spend, behavior, and past-experience insights after you log income, expenses, or goals.';
+};
+
+export const useAppStore = create<AppState>((set, get) => ({
   agentName: 'Guest',
   agentClass: 'Fiscal Vanguard',
   level: 0,
@@ -545,7 +605,7 @@ export const useAppStore = create<AppState>((set) => ({
   customCursorEnabled: true,
   isSidebarCollapsed: false,
   apiStatus: 'idle',
-  accentColor: '#cb2957',
+  accentColor: DEFAULT_ACCENT_COLOR,
 
   selectedCharacter: CHARACTERS[0],
 
@@ -559,6 +619,8 @@ export const useAppStore = create<AppState>((set) => ({
   analyticsDonutData: [],
   analyticsBarData: [],
   tacticalInsights: [],
+  athenaInsight: '',
+  isAthenaInsightLoading: false,
 
   isAddTransactionOpen: false,
   isAddBudgetOpen: false,
@@ -570,6 +632,12 @@ export const useAppStore = create<AppState>((set) => ({
     if (typeof localStorage !== 'undefined') localStorage.setItem(STORAGE_ACCENT, color);
     applyAccentColor(color);
     set({ accentColor: color });
+  },
+  hydrateDeviceAccent: () => {
+    const storedAccent = typeof localStorage !== 'undefined' ? localStorage.getItem(STORAGE_ACCENT) : null;
+    const accentColor = storedAccent || DEFAULT_ACCENT_COLOR;
+    applyAccentColor(accentColor);
+    set({ accentColor });
   },
   toggleCustomCursor: () => set((state) => ({ customCursorEnabled: !state.customCursorEnabled })),
   toggleSidebar: () => set((state) => ({ isSidebarCollapsed: !state.isSidebarCollapsed })),
@@ -729,6 +797,47 @@ export const useAppStore = create<AppState>((set) => ({
     await useAppStore.getState().loadBackendData();
   },
 
+  loadAthenaInsight: async () => {
+    if (get().isAthenaInsightLoading) return;
+
+    let userId = get().userId;
+    if (!userId) {
+      await get().loadBackendData();
+      userId = get().userId;
+    }
+
+    if (!userId) {
+      set({ athenaInsight: buildLocalAthenaInsight(get()) });
+      return;
+    }
+
+    set({ isAthenaInsightLoading: true });
+
+    try {
+      let athenaInsight = '';
+
+      try {
+        const report = await apiFetch<MonthlyReportResponse>(`/users/${userId}/ai/report`);
+        athenaInsight = buildAthenaInsightFromReport(report);
+      } catch {
+        const analysis = await apiFetch<AthenaAnalysisResponse>(`/users/${userId}/ai/analyze`, {
+          method: 'POST',
+        });
+        athenaInsight = buildAthenaInsightFromAnalysis(analysis);
+      }
+
+      set({
+        athenaInsight: athenaInsight || buildLocalAthenaInsight(get()),
+        isAthenaInsightLoading: false,
+      });
+    } catch {
+      set({
+        athenaInsight: buildLocalAthenaInsight(get()),
+        isAthenaInsightLoading: false,
+      });
+    }
+  },
+
   logout: () => {
     if (typeof localStorage !== 'undefined') localStorage.removeItem(STORAGE_USER_ID);
     set({
@@ -750,6 +859,8 @@ export const useAppStore = create<AppState>((set) => ({
       analyticsDonutData: [],
       analyticsBarData: [],
       tacticalInsights: [],
+      athenaInsight: '',
+      isAthenaInsightLoading: false,
       apiStatus: 'ready',
     });
   },

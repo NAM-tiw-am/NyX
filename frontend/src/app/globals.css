@@ -1,0 +1,182 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;700&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap');
+@import "tailwindcss";
+
+:root {
+  --background: #131313;
+  --foreground: #e2e2e2;
+  
+  --bg-surface: #000000;
+  --surface: #131313;
+  --surface-elevated: #1a1a1a;
+  --surface-variant: #353535;
+  --surface-container: #1f1f1f;
+  --surface-container-high: #2a2a2a;
+  --surface-container-highest: #353535;
+  
+  --primary: #ffb2bd;
+  --primary-container: #cb2957;
+  --accent-magenta: #cb2957;
+  --tertiary: #77da9f;
+  --tertiary-container: #007c4a;
+  --border-primary: #000000;
+  --text-high-contrast: #eeeeee;
+  --error: #ffb4ab;
+  --error-container: #93000a;
+}
+
+.bg-\[\#cb2957\] {
+  background-color: var(--accent-magenta) !important;
+}
+
+.text-\[\#cb2957\] {
+  color: var(--accent-magenta) !important;
+}
+
+.border-\[\#cb2957\] {
+  border-color: var(--accent-magenta) !important;
+}
+
+.border-t-\[\#cb2957\] {
+  border-top-color: var(--accent-magenta) !important;
+}
+
+.hover\:bg-\[\#cb2957\]:hover {
+  background-color: var(--accent-magenta) !important;
+}
+
+/* Hide Default Cursor when custom cursor is enabled */
+html.hide-default-cursor,
+html.hide-default-cursor *,
+html.hide-default-cursor button,
+html.hide-default-cursor a,
+html.hide-default-cursor input,
+html.hide-default-cursor select,
+html.hide-default-cursor textarea,
+html.hide-default-cursor [role="button"] {
+  cursor: none !important;
+}
+
+html {
+  scroll-behavior: smooth;
+  background-color: #131313;
+  color: #e2e2e2;
+}
+
+body {
+  background-color: #131313;
+  color: #e2e2e2;
+  font-family: 'Inter', sans-serif;
+  overflow-x: hidden;
+}
+
+/* Custom Brutalist Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #131313;
+  border-left: 2px solid #000;
+}
+::-webkit-scrollbar-thumb {
+  background: #cb2957;
+  border: 2px solid #000;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #ffb2bd;
+}
+
+/* Fonts */
+.font-space {
+  font-family: 'Space Grotesk', sans-serif;
+}
+.font-inter {
+  font-family: 'Inter', sans-serif;
+}
+.font-mono {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Brutalist Shadows & Buttons */
+.brutalist-border {
+  border: 3px solid #000000;
+}
+
+.brutalist-shadow {
+  box-shadow: 6px 6px 0px 0px #000000;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.brutalist-shadow:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 8px 8px 0px 0px #000000;
+}
+
+.brutalist-shadow:active, .brutalist-button:active {
+  transform: translate(4px, 4px) !important;
+  box-shadow: 2px 2px 0px 0px #000000 !important;
+}
+
+.brutalist-shadow-magenta {
+  box-shadow: 6px 6px 0px 0px #cb2957;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.brutalist-shadow-magenta:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 8px 8px 0px 0px #cb2957;
+}
+
+.brutalist-shadow-magenta:active {
+  transform: translate(4px, 4px) !important;
+  box-shadow: 2px 2px 0px 0px #cb2957 !important;
+}
+
+/* Retro HP/XP Health Bar */
+.health-bar-container {
+  border: 3px solid #000000;
+  background-color: #1a1a1a;
+  height: 24px;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.health-bar-fill {
+  background-color: #cb2957;
+  height: 100%;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  background-image: linear-gradient(90deg, transparent 85%, #000000 85%);
+  background-size: 16px 100%;
+}
+
+.health-bar-fill-green {
+  background-color: #77da9f;
+  height: 100%;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  background-image: linear-gradient(90deg, transparent 85%, #000000 85%);
+  background-size: 16px 100%;
+}
+
+/* Sprite Crop Helper */
+.sprite-crop {
+  transform: scale(1.4);
+  transform-origin: center center;
+}
+
+/* Glow animation for critical warning budget card */
+@keyframes pulse-glow {
+  0% { box-shadow: 0 0 0px #ffb4ab, 6px 6px 0px 0px #000000; }
+  50% { box-shadow: 0 0 15px #ffb4ab, 6px 6px 0px 0px #000000; }
+  100% { box-shadow: 0 0 0px #ffb4ab, 6px 6px 0px 0px #000000; }
+}
+
+.glow-warning {
+  animation: pulse-glow 2s infinite;
+}
+
+/* Material symbols setup */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  vertical-align: middle;
+}
